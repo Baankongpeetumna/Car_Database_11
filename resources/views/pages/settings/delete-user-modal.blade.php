@@ -13,16 +13,13 @@ new class extends Component {
     /**
      * Delete the currently authenticated user.
      */
-    public function deleteUser(Logout $logout): void
-    {
-        $this->validate([
-            'password' => $this->currentPasswordRules(),
-        ]);
-
-        tap(Auth::user(), $logout(...))->delete();
-
-        $this->redirect('/', navigate: true);
-    }
+    public function deleteUser(): void
+{
+    $this->addError(
+        'password',
+        'กรุณาติดต่อผู้ดูแลเพื่อขอปิดบัญชี',
+    );
+}
 }; ?>
 
 <flux:modal name="confirm-user-deletion" :show="$errors->isNotEmpty()" focusable class="max-w-lg">
