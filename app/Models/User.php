@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
@@ -38,6 +41,26 @@ class User extends Authenticatable
             'tier_id' => 'integer',
             'created_at' => 'datetime',
         ];
+    }
+
+    public function tier(): BelongsTo
+    {
+        return $this->belongsTo(MembershipTier::class, 'tier_id', 'tier_id');
+    }
+
+    public function cart(): HasOne
+    {
+        return $this->hasOne(Cart::class, 'member_id', 'member_id');
+    }
+
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class, 'member_id', 'member_id');
+    }
+
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class, 'member_id', 'member_id');
     }
 
     /**
