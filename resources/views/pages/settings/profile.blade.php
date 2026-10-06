@@ -75,7 +75,52 @@ new #[Title('Profile settings')] class extends Component {
     <x-pages::settings.layout
         heading="ข้อมูลโปรไฟล์"
         subheading="แก้ไขข้อมูลส่วนตัวของคุณ"
-    >
+    >         @php
+            $member = auth()->user();
+            $membershipTier = $member->tier;
+        @endphp
+
+        <div class="my-6 rounded-xl border border-zinc-200 p-5 dark:border-zinc-700">
+            <h3 class="text-lg font-semibold text-zinc-900 dark:text-white">
+                ข้อมูลสมาชิก
+            </h3>
+
+            <dl class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
+                <div>
+                    <dt class="text-sm text-zinc-500 dark:text-zinc-400">
+                        สิทธิ์ผู้ใช้งาน
+                    </dt>
+                    <dd class="mt-1 font-semibold text-zinc-900 dark:text-white">
+                        {{ $member->isAdmin() ? 'ผู้ดูแลระบบ' : 'สมาชิก' }}
+                    </dd>
+                </div>
+
+                <div>
+                    <dt class="text-sm text-zinc-500 dark:text-zinc-400">
+                        ระดับสมาชิก
+                    </dt>
+                    <dd class="mt-1 font-semibold text-zinc-900 dark:text-white">
+                        {{ $membershipTier?->tier_name ?? 'ยังไม่มีระดับสมาชิก' }}
+                    </dd>
+                </div>
+
+                <div>
+                    <dt class="text-sm text-zinc-500 dark:text-zinc-400">
+                        คะแนนสะสม
+                    </dt>
+                    <dd class="mt-1 font-semibold text-zinc-900 dark:text-white">
+                        {{ number_format($member->points) }} คะแนน
+                    </dd>
+                </div>
+            </dl>
+
+            @if ($membershipTier)
+                <p class="mt-4 text-sm text-zinc-600 dark:text-zinc-300">
+                    ส่วนลดตามระดับสมาชิก
+                    {{ number_format((float) $membershipTier->discount_percent, 2) }}%
+                </p>
+            @endif
+        </div>
         <form
             wire:submit="updateProfileInformation"
             class="my-6 w-full space-y-6"

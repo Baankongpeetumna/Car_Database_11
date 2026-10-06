@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProductController; // เพิ่ม
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\CartController;
 
 Route::view('/', 'welcome')->name('home');
 
@@ -22,5 +23,5 @@ Route::middleware(['auth', 'role:admin'])
 
         // เพิ่ม Routes จัดการรถ แบรนด์ และหมวดหมู่ตรงนี้ภายหลัง
     });
-
+require __DIR__.'/commerce.php';
 require __DIR__.'/settings.php';

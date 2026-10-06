@@ -12,6 +12,23 @@
 
                 <nav class="flex items-center gap-4 text-sm">
                     <a href="{{ route('products.index') }}">Cars</a>
+                    @auth
+    @if (auth()->user()->isMember())
+        <a href="{{ route('cart.index') }}">
+            ตะกร้า
+        </a>
+
+        <a href="{{ route('orders.index') }}">
+            ประวัติคำสั่งซื้อ
+        </a>
+    @endif
+
+    @if (auth()->user()->isAdmin())
+        <a href="{{ route('admin.orders.index') }}">
+            จัดการคำสั่งซื้อ
+        </a>
+    @endif
+@endauth
 
                     @auth
                         <a href="{{ route('dashboard') }}">Dashboard</a>

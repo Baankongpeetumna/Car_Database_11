@@ -18,6 +18,34 @@
                     <flux:sidebar.item icon="shopping-bag" :href="route('products.index')" :current="request()->routeIs('products.*')">
                         Cars
                     </flux:sidebar.item>
+                                        @if (auth()->user()->isMember())
+                        <flux:sidebar.item
+                            icon="shopping-cart"
+                            :href="route('cart.index')"
+                            :current="request()->routeIs('cart.*')"
+                        >
+                            My Cart
+                        </flux:sidebar.item>
+                        @if (auth()->user()->isMember())
+    <flux:sidebar.item
+        icon="clipboard-document-list"
+        :href="route('orders.index')"
+        :current="request()->routeIs('orders.*')"
+    >
+        ประวัติคำสั่งซื้อ
+    </flux:sidebar.item>
+@endif
+
+@if (auth()->user()->isAdmin())
+    <flux:sidebar.item
+        icon="clipboard-document-list"
+        :href="route('admin.orders.index')"
+        :current="request()->routeIs('admin.orders.*')"
+    >
+        จัดการคำสั่งซื้อ
+    </flux:sidebar.item>
+@endif
+                    @endif
                     @if (auth()->user()->isAdmin())
     <flux:sidebar.item
         icon="cog"

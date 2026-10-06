@@ -15,10 +15,10 @@
                 ระบบจัดการร้านรถ
             </flux:heading>
 
-            <flux:text class="mt-2">
-                หน้านี้อนุญาตเฉพาะบัญชีที่มีสิทธิ์ admin
-                ต่อไปสามารถเพิ่มระบบจัดการแบรนด์ หมวดหมู่ และรถได้
-            </flux:text>
+            <a href="{{ route('admin.orders.index') }}"
+   class="inline-block rounded-lg bg-blue-600 px-4 py-2 text-white">
+    จัดการคำสั่งซื้อ
+</a>
         </div>
 
         <flux:button :href="route('dashboard')" wire:navigate>
