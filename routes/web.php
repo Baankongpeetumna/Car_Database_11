@@ -4,10 +4,12 @@ use App\Http\Controllers\ProductController; // เพิ่ม
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CartController;
 
-Route::view('/', 'welcome')->name('home');
+// หน้าแรกพาไปหน้ารายการรถ (ชื่อ route 'home' เดิม ลิงก์โลโก้และหลัง logout จึงใช้ได้เหมือนเดิม)
+Route::redirect('/', '/products')->name('home');
 
 // เปิดดูได้โดยไม่ต้อง login
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+Route::get('/products/{car}', [ProductController::class, 'show'])->name('products.show');
 
 Route::middleware('auth')->group(function () {
     Route::view('/dashboard', 'dashboard')
@@ -24,4 +26,6 @@ Route::middleware(['auth', 'role:admin'])
         // เพิ่ม Routes จัดการรถ แบรนด์ และหมวดหมู่ตรงนี้ภายหลัง
     });
 require __DIR__.'/commerce.php';
+require __DIR__.'/admin-catalog.php';
+require __DIR__.'/storefront.php';
 require __DIR__.'/settings.php';

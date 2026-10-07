@@ -5,17 +5,17 @@
 
     <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div>
-            <h1 class="text-2xl font-semibold">ตะกร้าของฉัน</h1>
+            <h1 class="text-2xl font-semibold">My Cart</h1>
 
             <p class="mt-1 text-sm text-zinc-500">
-                {{ $items->count() }} รายการ
-                รวม {{ $totalQuantity }} คัน
+                {{ $items->count() }} {{ Str::plural('item', $items->count()) }}
+                · {{ $totalQuantity }} {{ Str::plural('car', $totalQuantity) }} in total
             </p>
         </div>
 
         <a href="{{ route('products.index') }}"
            class="rounded-lg border px-4 py-2">
-            เลือกรถเพิ่มเติม
+            Continue Shopping
         </a>
     </div>
 
@@ -33,25 +33,25 @@
                 </h2>
 
                 <p class="mt-2">
-                    ราคาต่อคัน
+                    Unit price
                     ฿{{ \App\Support\Money::display($item['unit_price_cents']) }}
                 </p>
 
                 <p class="mt-1 text-sm text-zinc-500">
-                    สต็อกปัจจุบัน {{ $car->stock_qty }} คัน
+                    In stock: {{ $car->stock_qty }}
                 </p>
 
                 @if ($item['quantity'] > $car->stock_qty)
                     <p class="mt-2 text-red-600">
-                        จำนวนเกินสต็อกปัจจุบัน
-                        กรุณาลดจำนวนหรือลบรายการ
+                        Quantity exceeds current stock.
+                        Please reduce the quantity or remove this item.
                     </p>
                 @endif
             </div>
 
             <div>
                 <p class="font-semibold">
-                    รวม
+                    Total
                     ฿{{ \App\Support\Money::display($item['line_total_cents']) }}
                 </p>
 
@@ -63,7 +63,7 @@
 
                     <label for="quantity-{{ $car->car_id }}"
                            class="sr-only">
-                        จำนวน {{ $car->model_name }}
+                        Quantity of {{ $car->model_name }}
                     </label>
 
                     <input
@@ -82,7 +82,7 @@
                         @disabled($car->stock_qty < 1)
                         class="rounded-lg bg-blue-600 px-4 py-2 text-white disabled:opacity-50"
                     >
-                        อัปเดต
+                        Update
                     </button>
                 </form>
 
@@ -93,37 +93,37 @@
                     @method('DELETE')
 
                     <button type="submit" class="text-red-600">
-                        ลบรายการ
+                        Remove
                     </button>
                 </form>
             </div>
         </div>
     @empty
         <p class="rounded-xl border p-8 text-center text-zinc-500">
-            ยังไม่มีรถในตะกร้า
+            Your cart is empty.
         </p>
     @endforelse
 
     @if ($items->isNotEmpty())
         <div class="mt-6 rounded-xl border border-zinc-200 p-5 dark:border-zinc-700">
             <p class="text-xl font-semibold">
-                ยอดก่อนส่วนลด
+                Subtotal
                 ฿{{ \App\Support\Money::display($subtotalCents) }}
             </p>
 
             <p class="my-3 text-sm text-zinc-500">
-                ตะกร้ายังไม่จองสต็อก
-                ตรวจราคา สต็อก และส่วนลดอีกครั้งตอนยืนยันซื้อ
+                Items in the cart are not reserved.
+                Price, stock and discount will be checked again at checkout.
             </p>
 
             @if ($canCheckout)
                 <a href="{{ route('checkout.create') }}"
                    class="inline-block rounded-lg bg-blue-600 px-5 py-2 text-white">
-                    ไปยืนยันคำสั่งซื้อ
+                    Proceed to Checkout
                 </a>
             @else
                 <p class="text-red-600">
-                    กรุณาแก้จำนวนให้ตรงกับสต็อกก่อนดำเนินการต่อ
+                    Please adjust quantities to match the available stock before continuing.
                 </p>
             @endif
         </div>

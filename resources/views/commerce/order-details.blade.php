@@ -1,37 +1,37 @@
 @php
     $labels = [
-        'pending' => 'รอดำเนินการ',
-        'processing' => 'กำลังดำเนินการ',
-        'completed' => 'สำเร็จ',
-        'cancelled' => 'ยกเลิก',
+        'pending' => 'Pending',
+        'processing' => 'Processing',
+        'completed' => 'Completed',
+        'cancelled' => 'Cancelled',
     ];
 
     $paymentLabels = [
-        'bank_transfer' => 'โอนเงิน',
-        'cash' => 'ชำระเงินที่ร้าน',
+        'bank_transfer' => 'Bank transfer',
+        'cash' => 'Pay at the store',
     ];
 @endphp
 
 <div class="mb-6 rounded-xl border border-zinc-200 p-5 dark:border-zinc-700">
     <h1 class="text-2xl font-semibold">
-        คำสั่งซื้อ #{{ $order->order_id }}
+        Order #{{ $order->order_id }}
     </h1>
 
     <p class="mt-2">
-        วันที่ {{ $order->order_date?->format('d/m/Y H:i') }}
+        Date: {{ $order->order_date?->format('d/m/Y H:i') }}
     </p>
 
     <p class="mt-2">
-        สถานะ:
+        Status:
         <strong>{{ $labels[$order->status] ?? $order->status }}</strong>
     </p>
 
     <p class="mt-2">
-        วิธีชำระเงิน:
+        Payment method:
         {{ $paymentLabels[$order->payment_method] ?? $order->payment_method }}
     </p>
 
-    <p class="mt-2">ที่อยู่จัดส่ง:</p>
+    <p class="mt-2">Shipping address:</p>
 
     <p class="whitespace-pre-wrap text-zinc-500">{{ $order->shipping_address }}</p>
 </div>
@@ -40,10 +40,10 @@
     <table class="w-full text-left text-sm">
         <thead>
             <tr class="border-b border-zinc-200 dark:border-zinc-700">
-                <th class="p-3">รถ</th>
-                <th class="p-3">ราคาตอนซื้อ</th>
-                <th class="p-3">จำนวน</th>
-                <th class="p-3">รวม</th>
+                <th class="p-3">Car</th>
+                <th class="p-3">Unit Price</th>
+                <th class="p-3">Quantity</th>
+                <th class="p-3">Total</th>
             </tr>
         </thead>
 
@@ -83,40 +83,40 @@
 
 <div class="my-6 space-y-2 rounded-xl border border-zinc-200 p-5 dark:border-zinc-700">
     <p>
-        ยอดก่อนส่วนลด:
+        Subtotal:
         ฿{{ \App\Support\Money::display(
             \App\Support\Money::cents($order->subtotal)
         ) }}
     </p>
 
     <p>
-        ส่วนลด:
+        Discount:
         ฿{{ \App\Support\Money::display(
             \App\Support\Money::cents($order->discount_amount)
         ) }}
     </p>
 
     <p class="text-xl font-semibold">
-        ยอดสุทธิ:
+        Total:
         ฿{{ \App\Support\Money::display(
             \App\Support\Money::cents($order->total_amount)
         ) }}
     </p>
 
     <p>
-        คะแนนที่ได้รับแล้ว:
-        {{ number_format($order->points_earned) }} คะแนน
+        Points earned:
+        {{ number_format($order->points_earned) }} points
     </p>
 
     @if (in_array($order->status, ['pending', 'processing'], true))
         <p class="text-sm text-zinc-500">
-            เมื่อคำสั่งซื้อสำเร็จ จะได้รับ
+            When this order is completed, you will earn
             {{ number_format(
                 \App\Support\Money::points(
                     \App\Support\Money::cents($order->total_amount)
                 )
             ) }}
-            คะแนน
+            points.
         </p>
     @endif
 </div>

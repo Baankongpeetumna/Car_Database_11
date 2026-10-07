@@ -45,7 +45,7 @@ class CommerceService
         $tier = $tierQuery->first();
 
         if (!$tier) {
-            $this->fail('ไม่พบระดับสมาชิก กรุณาติดต่อผู้ดูแลระบบ');
+            $this->fail('Membership tier not found. Please contact an administrator.');
         }
 
         $subtotal = 0;
@@ -55,7 +55,7 @@ class CommerceService
             $quantity = (int) $car->pivot->quantity;
 
             if ($quantity < 1) {
-                $this->fail('จำนวนรถไม่ถูกต้อง กรุณาแก้ไขตะกร้า');
+                $this->fail('Invalid car quantity. Please update your cart.');
             }
 
             $price = Money::cents($car->price);
@@ -64,7 +64,7 @@ class CommerceService
                 $price > 0
                 && $quantity > intdiv(Money::MAX_CENTS - $subtotal, $price)
             ) {
-                $this->fail('ยอดคำสั่งซื้อเกินขนาดที่ระบบรองรับ');
+                $this->fail('The order total exceeds the supported limit.');
             }
 
             $lineTotal = $price * $quantity;
@@ -81,7 +81,7 @@ class CommerceService
         $rate = Money::cents($tier->discount_percent);
 
         if ($rate > 10000) {
-            $this->fail('ส่วนลดระดับสมาชิกต้องอยู่ระหว่าง 0 ถึง 100%');
+            $this->fail('Membership discount must be between 0 and 100%.');
         }
 
         $discount = Money::discount(
@@ -89,7 +89,7 @@ class CommerceService
             $tier->discount_percent
         );
 
-        // ตรวจว่ารถ จำนวน ราคา และส่วนลดตรงกับที่ลูกค้าเห็นหรือไม่
+        // ตรวจว่ารถ จำนวน ราคา และส่วนลดตรงกับที่ลูกค้าเห็นมั้ย
         $fingerprint = hash('sha256', json_encode([
             $member->getKey(),
             $tier->getKey(),
@@ -122,12 +122,11 @@ class CommerceService
         array $token
     ): Order {
         return DB::transaction(function () use ($member, $input, $token) {
-            // ป้องกันคำขอของสมาชิกคนเดียวกันทำงานชนกัน
             $member = User::whereKey($member->getKey())
                 ->lockForUpdate()
                 ->firstOrFail();
 
-            // หากส่งคำขอเดิมซ้ำ ให้คืนคำสั่งซื้อเดิม
+
             $existing = $member->orders()
                 ->where('checkout_token', $token['id'])
                 ->first();
@@ -139,7 +138,7 @@ class CommerceService
             $quote = $this->quote($member, true);
 
             if ($quote['items'] === []) {
-                $this->fail('ตะกร้าว่าง กรุณาเลือกรถก่อนยืนยันซื้อ');
+                $this->fail('Your cart is empty. Please add a car before placing an order.');
             }
 
             if (
@@ -149,8 +148,8 @@ class CommerceService
                 )
             ) {
                 $this->fail(
-                    'รถ จำนวน ราคา หรือส่วนลดเปลี่ยนไป '
-                    .'กรุณาเปิดหน้า Checkout ใหม่เพื่อตรวจยอด'
+                    'Cars, quantities, prices or discounts have changed. '
+                    .'Please reopen the Checkout page to review your total.'
                 );
             }
 
@@ -160,8 +159,8 @@ class CommerceService
 
                 if ($item['quantity'] > (int) $car->stock_qty) {
                     $this->fail(
-                        "{$car->model_name} เหลือ {$car->stock_qty} คัน "
-                        .'กรุณาแก้ไขตะกร้า'
+                        "{$car->model_name}: only {$car->stock_qty} left. "
+                        .'Please update your cart.'
                     );
                 }
             }
@@ -179,7 +178,6 @@ class CommerceService
                 'points_earned' => 0,
             ]);
 
-            // กำหนดจาก Server โดยตรง ไม่รับรหัสนี้จากการแก้ Model ของผู้ใช้
             $order->checkout_token = $token['id'];
             $order->save();
 
@@ -210,7 +208,7 @@ class CommerceService
     public function changeStatus(Order $order, string $target): Order
     {
         return DB::transaction(function () use ($order, $target) {
-            // ล็อก MEMBER ก่อนเหมือนขั้นตอน Checkout
+            // ล็อก MEMBER ก่อนเหมือนตอน Checkout
             $member = User::whereKey($order->member_id)
                 ->lockForUpdate()
                 ->firstOrFail();
@@ -219,7 +217,6 @@ class CommerceService
                 ->lockForUpdate()
                 ->firstOrFail();
 
-            // ส่งสถานะเดิมซ้ำ ไม่เพิ่มคะแนนหรือคืนสต็อกซ้ำ
             if ($order->status === $target) {
                 return $order;
             }
@@ -239,12 +236,11 @@ class CommerceService
                 )
             ) {
                 $this->fail(
-                    'เปลี่ยนสถานะนี้ไม่ได้ '
-                    .'คำสั่งซื้อที่สำเร็จหรือยกเลิกแล้วถือว่าสิ้นสุด'
+                    'This status change is not allowed. '
+                    .'Completed or cancelled orders are final.'
                 );
             }
 
-            // ยกเลิกก่อนสำเร็จ: คืนสต็อก
             if ($target === 'cancelled') {
                 $cars = $order->cars()
                     ->orderBy('CAR.car_id')
@@ -256,7 +252,7 @@ class CommerceService
                         + (int) $car->pivot->quantity;
 
                     if ($newStock > 4294967295) {
-                        $this->fail('จำนวนสต็อกเกินขนาดที่ระบบรองรับ');
+                        $this->fail('Stock quantity exceeds the supported limit.');
                     }
 
                     $car->stock_qty = $newStock;
@@ -264,7 +260,6 @@ class CommerceService
                 }
             }
 
-            // สำเร็จ: ให้คะแนนและปรับ Tier
             if ($target === 'completed') {
                 $earned = Money::points(
                     Money::cents($order->total_amount)
@@ -273,7 +268,7 @@ class CommerceService
                 $newPoints = (int) $member->points + $earned;
 
                 if ($newPoints > 4294967295) {
-                    $this->fail('คะแนนสะสมเกินขนาดที่ระบบรองรับ');
+                    $this->fail('Points exceed the supported limit.');
                 }
 
                 $tier = MembershipTier::where(
@@ -287,7 +282,7 @@ class CommerceService
                     ->first();
 
                 if (!$tier) {
-                    $this->fail('ไม่พบระดับสมาชิกสำหรับคะแนนนี้');
+                    $this->fail('No membership tier found for these points.');
                 }
 
                 $member->forceFill([

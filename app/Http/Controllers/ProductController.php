@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Brand;
 use App\Models\Car;
 use App\Models\Category;
+use App\Models\Review;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -53,6 +54,34 @@ class ProductController extends Controller
             'cars' => $query->paginate(9)->withQueryString(),
             'brands' => Brand::orderBy('brand_name')->get(),
             'categories' => Category::orderBy('category_name')->get(),
+        ]);
+    }
+
+    // หน้ารายละเอียดรถ (เปิดดูได้โดยไม่ต้อง login)
+    public function show(Request $request, Car $car): View
+    {
+        $car->load(['brand', 'category']);
+
+        $reviews = $car->reviews()
+            ->with('member')
+            ->orderByDesc('created_at')
+            ->orderByDesc('review_id')
+            ->get();
+
+        // ค่าเฉลี่ยนับเฉพาะรีวิวที่มีคะแนน (รีวิวเก่าที่ rating เป็น NULL ไม่นับ)
+        $rated = $reviews->whereNotNull('rating');
+
+        // สมาชิกที่ซื้อรถคันนี้แล้ว (ออเดอร์ completed) จะเห็นฟอร์มเขียนรีวิว
+        $user = $request->user();
+        $reviewsLeft = $user?->isMember() ? Review::remainingFor($user, $car) : 0;
+
+        return view('products.show', [
+            'title' => $car->model_name,
+            'car' => $car,
+            'reviews' => $reviews,
+            'averageRating' => $rated->isNotEmpty() ? round($rated->avg('rating'), 1) : null,
+            'ratedCount' => $rated->count(),
+            'reviewsLeft' => $reviewsLeft,
         ]);
     }
 }

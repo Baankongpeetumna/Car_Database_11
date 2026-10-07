@@ -9,10 +9,12 @@ class ExampleTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_returns_a_successful_response(): void
+    // หน้าแรกพาไปหน้ารายการรถ
+    public function test_home_redirects_to_car_list(): void
     {
-        $response = $this->get(route('home'));
+        $this->get(route('home'))
+            ->assertRedirect('/products');
 
-        $response->assertOk();
+        $this->get('/products')->assertOk();
     }
 }

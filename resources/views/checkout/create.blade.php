@@ -4,11 +4,11 @@
     @include('commerce.messages')
 
     <h1 class="mb-4 text-2xl font-semibold">
-        ยืนยันคำสั่งซื้อ
+        Checkout
     </h1>
 
     <a href="{{ route('cart.index') }}" class="text-blue-600">
-        ← กลับไปแก้ตะกร้า
+        ← Back to Cart
     </a>
 
     <div class="my-5 space-y-3 rounded-xl border border-zinc-200 p-5 dark:border-zinc-700">
@@ -26,9 +26,9 @@
 
             @if ($item['quantity'] > $item['car']->stock_qty)
                 <p class="text-red-600">
-                    {{ $item['car']->model_name }}
-                    เหลือ {{ $item['car']->stock_qty }} คัน
-                    กรุณาแก้ตะกร้า
+                    {{ $item['car']->model_name }}:
+                    only {{ $item['car']->stock_qty }} left.
+                    Please update your cart.
                 </p>
             @endif
         @endforeach
@@ -36,31 +36,31 @@
         <hr class="border-zinc-300 dark:border-zinc-700">
 
         <p>
-            ระดับสมาชิก:
+            Membership tier:
             {{ $quote['tier']->tier_name }}
-            (ส่วนลด {{ $quote['tier']->discount_percent }}%)
+            ({{ $quote['tier']->discount_percent }}% discount)
         </p>
 
         <p>
-            ยอดก่อนส่วนลด:
+            Subtotal:
             ฿{{ \App\Support\Money::display($quote['subtotal']) }}
         </p>
 
         <p>
-            ส่วนลด:
+            Discount:
             ฿{{ \App\Support\Money::display($quote['discount']) }}
         </p>
 
         <p class="text-xl font-semibold">
-            ยอดสุทธิ:
+            Total:
             ฿{{ \App\Support\Money::display($quote['total']) }}
         </p>
 
         <p class="text-sm text-zinc-500">
-            ได้รับ
+            You will earn
             {{ number_format(\App\Support\Money::points($quote['total'])) }}
-            คะแนนเมื่อคำสั่งซื้อสำเร็จ
-            (ยอดสุทธิทุก 1,000 บาท = 1 คะแนน เศษปัดทิ้ง)
+            points when this order is completed
+            (1 point per ฿1,000 of the total, rounded down).
         </p>
     </div>
 
@@ -75,7 +75,7 @@
 
         <div>
             <label for="shipping_address" class="mb-2 block">
-                ที่อยู่จัดส่ง
+                Shipping address
             </label>
 
             <textarea
@@ -90,7 +90,7 @@
 
         <div>
             <label for="payment_method" class="mb-2 block">
-                วิธีชำระเงิน
+                Payment method
             </label>
 
             <select
@@ -101,24 +101,24 @@
             >
                 <option value="bank_transfer"
                         @selected(old('payment_method') === 'bank_transfer')>
-                    โอนเงิน
+                    Bank transfer
                 </option>
 
                 <option value="cash"
                         @selected(old('payment_method') === 'cash')>
-                    ชำระเงินที่ร้าน
+                    Pay at the store
                 </option>
             </select>
         </div>
 
         <p class="text-sm text-zinc-500">
-            หลังยืนยัน กรุณาติดต่อร้านเพื่อชำระเงินและนัดหมายส่งมอบรถ
-            ผู้ดูแลจะตรวจสอบก่อนปรับสถานะเป็นสำเร็จ
+            After placing the order, please contact the store to arrange payment and delivery.
+            An admin will verify it before marking the order as completed.
         </p>
 
         <button type="submit"
                 class="rounded-lg bg-blue-600 px-5 py-3 text-white">
-            ยืนยันคำสั่งซื้อ
+            Place Order
         </button>
     </form>
 @endsection

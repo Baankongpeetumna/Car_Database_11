@@ -60,7 +60,7 @@ new #[Title('Profile settings')] class extends Component {
 
         Flux::toast(
             variant: 'success',
-            text: 'บันทึกข้อมูลโปรไฟล์แล้ว',
+            text: 'Profile updated.',
         );
     }
 }; ?>
@@ -69,12 +69,12 @@ new #[Title('Profile settings')] class extends Component {
     @include('partials.settings-heading')
 
     <flux:heading level="2" class="sr-only">
-        ข้อมูลโปรไฟล์
+        Profile
     </flux:heading>
 
     <x-pages::settings.layout
-        heading="ข้อมูลโปรไฟล์"
-        subheading="แก้ไขข้อมูลส่วนตัวของคุณ"
+        heading="Profile"
+        subheading="Update your personal information"
     >         @php
             $member = auth()->user();
             $membershipTier = $member->tier;
@@ -82,44 +82,48 @@ new #[Title('Profile settings')] class extends Component {
 
         <div class="my-6 rounded-xl border border-zinc-200 p-5 dark:border-zinc-700">
             <h3 class="text-lg font-semibold text-zinc-900 dark:text-white">
-                ข้อมูลสมาชิก
+                Membership
             </h3>
 
             <dl class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
                 <div>
                     <dt class="text-sm text-zinc-500 dark:text-zinc-400">
-                        สิทธิ์ผู้ใช้งาน
+                        Role
                     </dt>
                     <dd class="mt-1 font-semibold text-zinc-900 dark:text-white">
-                        {{ $member->isAdmin() ? 'ผู้ดูแลระบบ' : 'สมาชิก' }}
+                        {{ $member->isAdmin() ? 'Administrator' : 'Member' }}
                     </dd>
                 </div>
 
                 <div>
                     <dt class="text-sm text-zinc-500 dark:text-zinc-400">
-                        ระดับสมาชิก
+                        Membership tier
                     </dt>
                     <dd class="mt-1 font-semibold text-zinc-900 dark:text-white">
-                        {{ $membershipTier?->tier_name ?? 'ยังไม่มีระดับสมาชิก' }}
+                        {{ $membershipTier?->tier_name ?? 'No tier yet' }}
                     </dd>
                 </div>
 
                 <div>
                     <dt class="text-sm text-zinc-500 dark:text-zinc-400">
-                        คะแนนสะสม
+                        Points
                     </dt>
                     <dd class="mt-1 font-semibold text-zinc-900 dark:text-white">
-                        {{ number_format($member->points) }} คะแนน
+                        {{ number_format($member->points) }} points
                     </dd>
                 </div>
             </dl>
 
             @if ($membershipTier)
                 <p class="mt-4 text-sm text-zinc-600 dark:text-zinc-300">
-                    ส่วนลดตามระดับสมาชิก
+                    Tier discount:
                     {{ number_format((float) $membershipTier->discount_percent, 2) }}%
                 </p>
             @endif
+
+            <a href="{{ route('membership.index') }}" class="mt-3 inline-block text-sm text-blue-600">
+                See all tiers and your progress →
+            </a>
         </div>
         <form
             wire:submit="updateProfileInformation"
@@ -127,7 +131,7 @@ new #[Title('Profile settings')] class extends Component {
         >
             <flux:input
                 wire:model="first_name"
-                label="ชื่อ"
+                label="First name"
                 type="text"
                 required
                 autocomplete="given-name"
@@ -135,7 +139,7 @@ new #[Title('Profile settings')] class extends Component {
 
             <flux:input
                 wire:model="last_name"
-                label="นามสกุล"
+                label="Last name"
                 type="text"
                 required
                 autocomplete="family-name"
@@ -143,7 +147,7 @@ new #[Title('Profile settings')] class extends Component {
 
             <flux:input
                 wire:model="email"
-                label="อีเมล"
+                label="Email"
                 type="email"
                 required
                 autocomplete="email"
@@ -151,14 +155,14 @@ new #[Title('Profile settings')] class extends Component {
 
             <flux:input
                 wire:model="phone"
-                label="เบอร์โทรศัพท์"
+                label="Phone number"
                 type="tel"
                 autocomplete="tel"
             />
 
             <flux:textarea
                 wire:model="address"
-                label="ที่อยู่"
+                label="Address"
                 rows="3"
             />
 
@@ -167,7 +171,7 @@ new #[Title('Profile settings')] class extends Component {
                 type="submit"
                 data-test="update-profile-button"
             >
-                บันทึกข้อมูล
+                Save
             </flux:button>
         </form>
     </x-pages::settings.layout>

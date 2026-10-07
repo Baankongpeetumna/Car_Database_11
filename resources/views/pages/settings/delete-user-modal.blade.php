@@ -17,7 +17,7 @@ new class extends Component {
 {
     $this->addError(
         'password',
-        'กรุณาติดต่อผู้ดูแลเพื่อขอปิดบัญชี',
+        'Please contact an administrator to close your account.',
     );
 }
 }; ?>

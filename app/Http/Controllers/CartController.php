@@ -86,7 +86,7 @@ class CartController extends Controller
         }, 3);
 
         return redirect()->route('cart.index')
-            ->with('success', 'เพิ่มรถลงตะกร้าแล้ว');
+            ->with('success', 'Car added to your cart.');
     }
 
     public function update(Request $request, Car $car): RedirectResponse
@@ -120,7 +120,7 @@ class CartController extends Controller
         }, 3);
 
         return redirect()->route('cart.index')
-            ->with('success', 'อัปเดตจำนวนแล้ว');
+            ->with('success', 'Quantity updated.');
     }
 
     public function destroy(Request $request, Car $car): RedirectResponse
@@ -135,7 +135,7 @@ class CartController extends Controller
         }, 3);
 
         return redirect()->route('cart.index')
-            ->with('success', 'ลบรายการแล้ว');
+            ->with('success', 'Item removed from your cart.');
     }
 
     private function lockedCart(Request $request): Cart
@@ -151,8 +151,8 @@ class CartController extends Controller
     {
         if ($quantity > (int) $car->stock_qty) {
             throw ValidationException::withMessages([
-                'quantity' => "{$car->model_name} เหลือ {$car->stock_qty} คัน "
-                    .'จำนวนรวมในตะกร้าต้องไม่เกินสต็อก',
+                'quantity' => "{$car->model_name}: only {$car->stock_qty} left. "
+                    .'The total quantity in your cart cannot exceed the stock.',
             ]);
         }
     }

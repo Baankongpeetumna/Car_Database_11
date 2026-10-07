@@ -1,30 +1,28 @@
-@extends('layouts.public')
-
-@section('content')
+<x-layouts::app :title="'Order #'.$order->order_id">
     @include('commerce.messages')
 
     <a href="{{ route('admin.orders.index') }}"
        class="mb-4 inline-block text-blue-600">
-        ← รายการคำสั่งซื้อทั้งหมด
+        ← All Orders
     </a>
 
     <div class="mb-4 rounded-xl border border-zinc-200 p-4 dark:border-zinc-700">
         <p>
-            สมาชิก:
+            Member:
             {{ $order->member?->name }}
             · {{ $order->member?->email }}
         </p>
 
         <p>
-            โทรศัพท์:
+            Phone:
             {{ $order->member?->phone ?? '-' }}
         </p>
 
         <p>
-            คะแนนปัจจุบัน:
+            Current points:
             {{ number_format($order->member?->points ?? 0) }}
 
-            · ระดับปัจจุบัน:
+            · Current tier:
             {{ $order->member?->tier?->tier_name ?? '-' }}
         </p>
     </div>
@@ -39,7 +37,7 @@
             @method('PATCH')
 
             <label for="status" class="block font-semibold">
-                เปลี่ยนสถานะคำสั่งซื้อ
+                Change Order Status
             </label>
 
             <select
@@ -48,36 +46,36 @@
                 required
                 class="w-full rounded-lg border border-zinc-300 bg-white p-3 dark:border-zinc-600 dark:bg-zinc-800"
             >
-                <option value="">เลือกสถานะใหม่</option>
+                <option value="">Select new status</option>
 
                 @if ($order->status === 'pending')
                     <option value="processing">
-                        กำลังดำเนินการ
+                        Processing
                     </option>
                 @endif
 
                 <option value="completed">
-                    สำเร็จ — เพิ่มคะแนนและปรับระดับสมาชิก
+                    Completed — add points and update member tier
                 </option>
 
                 <option value="cancelled">
-                    ยกเลิก — คืนสต็อก
+                    Cancelled — return stock
                 </option>
             </select>
 
             <p class="text-sm text-zinc-500">
-                เลือกสำเร็จหลังตรวจการชำระเงินและส่งมอบรถแล้ว
-                สถานะสำเร็จและยกเลิกถือว่าสิ้นสุด
+                Select Completed only after payment and car delivery have been verified.
+                Completed and Cancelled are final statuses.
             </p>
 
             <button type="submit"
                     class="rounded-lg bg-blue-600 px-5 py-2 text-white">
-                บันทึกสถานะ
+                Save Status
             </button>
         </form>
     @else
         <p class="rounded-xl border p-4">
-            คำสั่งซื้อสิ้นสุดแล้ว ไม่สามารถเปลี่ยนสถานะได้
+            This order is closed. Its status can no longer be changed.
         </p>
     @endif
-@endsection
+</x-layouts::app>

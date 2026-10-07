@@ -12,21 +12,27 @@
 
                 <nav class="flex items-center gap-4 text-sm">
                     <a href="{{ route('products.index') }}">Cars</a>
+                    <a href="{{ route('membership.index') }}">Membership</a>
                     @auth
     @if (auth()->user()->isMember())
         <a href="{{ route('cart.index') }}">
-            ตะกร้า
+            My Cart
         </a>
 
         <a href="{{ route('orders.index') }}">
-            ประวัติคำสั่งซื้อ
+            My Orders
         </a>
     @endif
 
+    {{-- admin: ลิงก์เข้าหลังร้าน + ป้ายบอกว่าเป็นบัญชี admin --}}
     @if (auth()->user()->isAdmin())
-        <a href="{{ route('admin.orders.index') }}">
-            จัดการคำสั่งซื้อ
+        <a href="{{ route('admin.dashboard') }}">
+            Admin Panel
         </a>
+
+        <span class="rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-700 dark:bg-red-900/40 dark:text-red-300">
+            🛡️ Admin
+        </span>
     @endif
 @endauth
 

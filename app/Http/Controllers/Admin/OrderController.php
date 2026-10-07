@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\AdminLog;
 use App\Models\Order;
 use App\Services\CommerceService;
 use Illuminate\Http\RedirectResponse;
@@ -61,9 +62,21 @@ class OrderController extends Controller
             ],
         ]);
 
-        $service->changeStatus($order, $input['status']);
+        $oldStatus = $order->status;
+        $updated = $service->changeStatus($order, $input['status']);
+
+        // บันทึก log (ไม่บันทึกถ้าส่งสถานะเดิมซ้ำ)
+        if ($updated->status !== $oldStatus) {
+            $changes = ['status' => [$oldStatus, $updated->status]];
+
+            if ($updated->status === 'completed') {
+                $changes['points_earned'] = [0, (int) $updated->points_earned];
+            }
+
+            AdminLog::record('status_changed', $updated, "Order #{$updated->order_id}", $changes);
+        }
 
         return redirect()->route('admin.orders.show', $order)
-            ->with('success', 'บันทึกสถานะแล้ว');
+            ->with('success', 'Order status updated.');
     }
 }

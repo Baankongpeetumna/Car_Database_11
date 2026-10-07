@@ -10,6 +10,15 @@
                 <flux:sidebar.collapse class="lg:hidden" />
             </flux:sidebar.header>
 
+            {{-- ป้ายบอกว่ากำลังใช้บัญชี admin --}}
+            @if (auth()->user()->isAdmin())
+                <div class="px-2">
+                    <flux:badge color="red" icon="shield-check" size="sm">
+                        Admin account
+                    </flux:badge>
+                </div>
+            @endif
+
             <flux:sidebar.nav>
                 <flux:sidebar.group :heading="__('Platform')" class="grid">
                     <flux:sidebar.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>
@@ -26,37 +35,93 @@
                         >
                             My Cart
                         </flux:sidebar.item>
-                        @if (auth()->user()->isMember())
-    <flux:sidebar.item
-        icon="clipboard-document-list"
-        :href="route('orders.index')"
-        :current="request()->routeIs('orders.*')"
-    >
-        ประวัติคำสั่งซื้อ
-    </flux:sidebar.item>
-@endif
-
-@if (auth()->user()->isAdmin())
-    <flux:sidebar.item
-        icon="clipboard-document-list"
-        :href="route('admin.orders.index')"
-        :current="request()->routeIs('admin.orders.*')"
-    >
-        จัดการคำสั่งซื้อ
-    </flux:sidebar.item>
-@endif
+                        <flux:sidebar.item
+                            icon="clipboard-document-list"
+                            :href="route('orders.index')"
+                            :current="request()->routeIs('orders.*')"
+                        >
+                            My Orders
+                        </flux:sidebar.item>
+                        <flux:sidebar.item
+                            icon="trophy"
+                            :href="route('membership.index')"
+                            :current="request()->routeIs('membership.*')"
+                        >
+                            Membership
+                        </flux:sidebar.item>
                     @endif
-                    @if (auth()->user()->isAdmin())
-    <flux:sidebar.item
-        icon="cog"
-        :href="route('admin.dashboard')"
-        :current="request()->routeIs('admin.*')"
-        wire:navigate
-    >
-        Admin
-    </flux:sidebar.item>
-@endif
                 </flux:sidebar.group>
+
+                {{-- เมนู Admin (หลังร้าน) --}}
+                @if (auth()->user()->isAdmin())
+                    <flux:sidebar.group heading="Admin Panel" class="grid">
+                        <flux:sidebar.item
+                            icon="cog"
+                            :href="route('admin.dashboard')"
+                            :current="request()->routeIs('admin.dashboard')"
+                            wire:navigate
+                        >
+                            Admin Dashboard
+                        </flux:sidebar.item>
+
+                        <flux:sidebar.item
+                            icon="clipboard-document-list"
+                            :href="route('admin.orders.index')"
+                            :current="request()->routeIs('admin.orders.*')"
+                        >
+                            Orders
+                        </flux:sidebar.item>
+
+                        {{-- จัดการข้อมูลร้าน (routes/admin-catalog.php) --}}
+                        <flux:sidebar.item
+                            icon="tag"
+                            :href="route('admin.brands.index')"
+                            :current="request()->routeIs('admin.brands.*')"
+                        >
+                            Brands
+                        </flux:sidebar.item>
+
+                        <flux:sidebar.item
+                            icon="squares-2x2"
+                            :href="route('admin.categories.index')"
+                            :current="request()->routeIs('admin.categories.*')"
+                        >
+                            Categories
+                        </flux:sidebar.item>
+
+                        <flux:sidebar.item
+                            icon="truck"
+                            :href="route('admin.cars.index')"
+                            :current="request()->routeIs('admin.cars.*')"
+                        >
+                            Cars
+                        </flux:sidebar.item>
+
+                        <flux:sidebar.item
+                            icon="trophy"
+                            :href="route('admin.tiers.index')"
+                            :current="request()->routeIs('admin.tiers.*')"
+                        >
+                            Membership Tiers
+                        </flux:sidebar.item>
+
+                        <flux:sidebar.item
+                            icon="star"
+                            :href="route('admin.reviews.index')"
+                            :current="request()->routeIs('admin.reviews.*')"
+                        >
+                            Reviews
+                        </flux:sidebar.item>
+
+                        <flux:sidebar.item
+                            icon="document-text"
+                            :href="route('admin.logs.index')"
+                            :current="request()->routeIs('admin.logs.*')"
+                        >
+                            Activity Log
+                        </flux:sidebar.item>
+                    </flux:sidebar.group>
+                @endif
             </flux:sidebar.nav>
 
             <flux:spacer />

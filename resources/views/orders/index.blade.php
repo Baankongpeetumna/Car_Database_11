@@ -5,15 +5,15 @@
 
     @php
         $labels = [
-            'pending' => 'รอดำเนินการ',
-            'processing' => 'กำลังดำเนินการ',
-            'completed' => 'สำเร็จ',
-            'cancelled' => 'ยกเลิก',
+            'pending' => 'Pending',
+            'processing' => 'Processing',
+            'completed' => 'Completed',
+            'cancelled' => 'Cancelled',
         ];
     @endphp
 
     <h1 class="mb-6 text-2xl font-semibold">
-        ประวัติคำสั่งซื้อของฉัน
+        My Orders
     </h1>
 
     @forelse ($orders as $order)
@@ -24,6 +24,12 @@
                 · {{ $labels[$order->status] ?? $order->status }}
             </strong>
 
+            @if (in_array($order->order_id, $reviewableOrderIds, true))
+                <span class="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">
+                    ★ Review available
+                </span>
+            @endif
+
             <p class="mt-2">
                 {{ $order->order_date?->format('d/m/Y H:i') }}
                 · ฿{{ \App\Support\Money::display(
@@ -32,7 +38,7 @@
             </p>
         </a>
     @empty
-        <p class="text-zinc-500">ยังไม่มีคำสั่งซื้อ</p>
+        <p class="text-zinc-500">You have no orders yet.</p>
     @endforelse
 
     <div class="mt-6">

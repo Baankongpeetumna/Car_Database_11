@@ -1,8 +1,8 @@
 <x-layouts::auth :title="__('Register')">
     <div class="flex flex-col gap-6">
         <x-auth-header
-            title="สมัครสมาชิก"
-            description="กรอกข้อมูลเพื่อสร้างบัญชีของคุณ"
+            title="Create an account"
+            description="Enter your details below to create your account"
         />
 
         <x-auth-session-status
@@ -19,7 +19,7 @@
 
             <flux:input
                 name="first_name"
-                label="ชื่อ"
+                label="First name"
                 :value="old('first_name')"
                 type="text"
                 required
@@ -30,7 +30,7 @@
 
             <flux:input
                 name="last_name"
-                label="นามสกุล"
+                label="Last name"
                 :value="old('last_name')"
                 type="text"
                 required
@@ -40,7 +40,7 @@
 
             <flux:input
                 name="email"
-                label="อีเมล"
+                label="Email address"
                 :value="old('email')"
                 type="email"
                 required
@@ -50,7 +50,7 @@
 
             <flux:input
                 name="phone"
-                label="เบอร์โทรศัพท์"
+                label="Phone number"
                 :value="old('phone')"
                 type="tel"
                 autocomplete="tel"
@@ -59,14 +59,14 @@
 
             <flux:textarea
                 name="address"
-                label="ที่อยู่"
+                label="Address"
                 rows="3"
                 maxlength="5000"
             >{{ old('address') }}</flux:textarea>
 
             <flux:input
                 name="password"
-                label="รหัสผ่าน"
+                label="Password"
                 type="password"
                 required
                 autocomplete="new-password"
@@ -75,7 +75,7 @@
 
             <flux:input
                 name="password_confirmation"
-                label="ยืนยันรหัสผ่าน"
+                label="Confirm password"
                 type="password"
                 required
                 autocomplete="new-password"
@@ -88,14 +88,14 @@
                 class="w-full"
                 data-test="register-user-button"
             >
-                สมัครสมาชิก
+                Create account
             </flux:button>
         </form>
 
         <div class="text-center text-sm">
-            มีบัญชีแล้ว?
+            Already have an account?
             <flux:link :href="route('login')" wire:navigate>
-                เข้าสู่ระบบ
+                Log in
             </flux:link>
         </div>
     </div>

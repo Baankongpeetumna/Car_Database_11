@@ -23,7 +23,7 @@ class CheckoutController extends Controller
         if ($quote['items'] === []) {
             return redirect()->route('cart.index')
                 ->withErrors([
-                    'commerce' => 'กรุณาเพิ่มรถลงตะกร้าก่อน',
+                    'commerce' => 'Please add a car to your cart first.',
                 ]);
         }
 
@@ -58,7 +58,7 @@ class CheckoutController extends Controller
 
         if ($input['shipping_address'] === '') {
             throw ValidationException::withMessages([
-                'shipping_address' => 'กรุณากรอกที่อยู่จัดส่ง',
+                'shipping_address' => 'Please enter a shipping address.',
             ]);
         }
 
@@ -71,8 +71,8 @@ class CheckoutController extends Controller
             );
         } catch (DecryptException|\JsonException $e) {
             throw ValidationException::withMessages([
-                'checkout_token' => 'ข้อมูลยืนยันไม่ถูกต้อง '
-                    .'กรุณาเปิด Checkout ใหม่',
+                'checkout_token' => 'Invalid checkout data. '
+                    .'Please reopen the Checkout page.',
             ]);
         }
 
@@ -87,8 +87,8 @@ class CheckoutController extends Controller
             || $token['expires'] < now()->timestamp
         ) {
             throw ValidationException::withMessages([
-                'checkout_token' => 'ข้อมูลยืนยันหมดอายุหรือไม่ถูกต้อง '
-                    .'กรุณาเปิด Checkout ใหม่',
+                'checkout_token' => 'Checkout data has expired or is invalid. '
+                    .'Please reopen the Checkout page.',
             ]);
         }
 
@@ -101,7 +101,7 @@ class CheckoutController extends Controller
         return redirect()->route('orders.show', $order)
             ->with(
                 'success',
-                'บันทึกคำสั่งซื้อแล้ว กรุณาติดต่อร้านเพื่อชำระเงิน'
+                'Order placed. Please contact the store to complete payment.'
             );
     }
 }
