@@ -16,6 +16,11 @@
             </flux:heading>
 
             <div class="mt-4 flex flex-wrap gap-3">
+
+                <a href="{{ route('admin.members.index') }}"
+                class="inline-block rounded-lg bg-blue-600 px-4 py-2 text-white">
+                    Manage Members
+                </a>
                 <a href="{{ route('admin.orders.index') }}"
                    class="inline-block rounded-lg bg-blue-600 px-4 py-2 text-white">
                     Manage Orders

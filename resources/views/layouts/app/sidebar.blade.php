@@ -60,6 +60,13 @@
                         >
                             Admin Dashboard
                         </flux:sidebar.item>
+                        <flux:sidebar.item
+                            icon="users"
+                            :href="route('admin.members.index')"
+                                :current="request()->routeIs('admin.members.*')"
+                            >
+                                Members
+                        </flux:sidebar.item>
 
                         <flux:sidebar.item
                             icon="clipboard-document-list"
