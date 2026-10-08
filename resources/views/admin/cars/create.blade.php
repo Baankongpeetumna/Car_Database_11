@@ -1,26 +1,36 @@
 <x-layouts::app :title="'Add Car'">
-    @include('commerce.messages')
+    <div class="min-h-full bg-zinc-50 dark:bg-zinc-950">
+        <div class="space-y-6 p-2 sm:p-4">
 
-    <a href="{{ route('admin.cars.index') }}"
-       class="mb-4 inline-block text-blue-600">
-        ← All Cars
-    </a>
+            @include('commerce.messages')
 
-    <h1 class="mb-4 text-2xl font-semibold">
-        Add Car
-    </h1>
+            {{-- Header --}}
+            <div>
+                <div class="flex items-center gap-2 text-sm text-zinc-400">
+                    <a href="{{ route('admin.dashboard') }}" class="hover:text-red-600">Admin</a>
+                    <span>/</span>
+                    <a href="{{ route('admin.cars.index') }}" class="hover:text-red-600">Cars</a>
+                    <span>/</span>
+                    <span class="text-zinc-600 dark:text-zinc-300">Add new car</span>
+                </div>
 
-    <form method="POST"
-          action="{{ route('admin.cars.store') }}"
-          enctype="multipart/form-data"
-          class="space-y-4 rounded-xl border border-zinc-200 p-5 dark:border-zinc-700">
-        @csrf
+                <flux:heading size="xl" level="1" class="font-display mt-2 font-semibold">
+                    Add new car
+                </flux:heading>
 
-        @include('admin.cars._form')
+                <flux:text class="mt-1 text-zinc-500">
+                    Fill in the details to add a car to your showroom
+                </flux:text>
+            </div>
 
-        <button type="submit"
-                class="rounded-lg bg-blue-600 px-5 py-2 text-white">
-            Save
-        </button>
-    </form>
+            <form method="POST"
+                  action="{{ route('admin.cars.store') }}"
+                  enctype="multipart/form-data">
+                @csrf
+
+                @include('admin.cars._form')
+            </form>
+
+        </div>
+    </div>
 </x-layouts::app>

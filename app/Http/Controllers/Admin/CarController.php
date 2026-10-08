@@ -38,8 +38,7 @@ class CarController extends Controller
             'q' => ['nullable', 'string', 'max:255'],
             'brand' => ['nullable', 'integer'],
             'category' => ['nullable', 'integer'],
-            'stock' => ['nullable', Rule::in(['in', 'out'])],
-        ]);
+            'stock' => ['nullable', Rule::in(['in', 'out', 'low'])],        ]);
 
         $search = trim((string) ($filters['q'] ?? ''));
 
@@ -54,6 +53,7 @@ class CarController extends Controller
             ->when($filters['category'] ?? null, fn ($q, $id) => $q->where('category_id', $id))
             ->when(($filters['stock'] ?? null) === 'in', fn ($q) => $q->where('stock_qty', '>', 0))
             ->when(($filters['stock'] ?? null) === 'out', fn ($q) => $q->where('stock_qty', 0))
+            ->when(($filters['stock'] ?? null) === 'low', fn ($q) => $q->where('stock_qty', '<', 3)->orderBy('stock_qty'))
             ->orderBy('car_id')
             ->paginate(15)
             ->withQueryString();
