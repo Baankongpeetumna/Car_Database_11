@@ -45,7 +45,7 @@
             </div>
         @endif
 
-        {{-- ========== ADMIN: menu follows the Admin account badge directly ========== --}}
+       
         @if (auth()->user()->isAdmin())
             <flux:sidebar.nav class="gap-1">
                 <flux:sidebar.item
@@ -56,6 +56,16 @@
                     wire:navigate
                 >
                     Admin Dashboard
+                </flux:sidebar.item>
+
+                {{-- Members (added by teammate) --}}
+                <flux:sidebar.item
+                    icon="users"
+                    :href="route('admin.members.index')"
+                    :current="request()->routeIs('admin.members.*')"
+                    :class="$navItem . ' ' . $active('admin.members.*')"
+                >
+                    Members
                 </flux:sidebar.item>
 
                 <flux:sidebar.item
@@ -123,7 +133,7 @@
                 </flux:sidebar.item>
             </flux:sidebar.nav>
 
-        {{-- ========== NON-ADMIN (customers / members): keeps the Platform menu ========== --}}
+        
         @else
             <flux:sidebar.nav class="gap-1">
                 <flux:sidebar.group :heading="__('Platform')" class="grid gap-1">
