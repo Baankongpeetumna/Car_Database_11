@@ -73,20 +73,67 @@ final class CarVisual
     }
 
     /** URL รูปรถ หรือ null ถ้าไม่มีรูป (รองรับทั้งลิงก์เต็มและไฟล์ใน storage) */
-    public static function imageSrc(Car $car): ?string
-    {
-        $url = trim((string) $car->image_url);
+    /**
+ * ใช้รูปที่บันทึกในฐานข้อมูลก่อน
+ * ถ้ายังไม่มี ใช้รูปรุ่นรถที่มากับโปรเจกต์
+ */
+public static function imageSrc(Car $car): ?string
+{
+    $url = trim((string) $car->image_url);
 
-        if ($url === '') {
-            return null;
-        }
-
-        if (str_starts_with($url, 'http://') || str_starts_with($url, 'https://') || str_starts_with($url, '/')) {
+    if ($url !== '') {
+        if (
+            str_starts_with($url, 'http://')
+            || str_starts_with($url, 'https://')
+            || str_starts_with($url, '/')
+        ) {
             return $url;
         }
 
         return asset('storage/'.ltrim($url, '/'));
     }
+
+    // ชื่อรุ่นใน CAR.model_name => ไฟล์ใน public/images/cars/
+    $images = [
+        'Camry 2.5 HEV' => 'toyota-camry.jpg',
+        'Hilux Revo 2.4' => 'toyota-hilux.jpg',
+        'Fortuner 2.8 Legender' => 'toyota-fortuner.jpg',
+
+        'Civic e:HEV RS' => 'honda-civic.jpg',
+        'CR-V 1.5 Turbo' => 'honda-crv.jpg',
+        'Jazz 1.5 RS' => 'honda-jazz.jpg',
+
+        'Mazda3 2.0 SP' => 'mazda3.jpg',
+        'CX-5 2.2 XDL' => 'mazda-cx5.jpg',
+
+        '320d M Sport' => 'bmw-320d.jpg',
+        '430i M Sport Coupe' => 'bmw-430i.jpg',
+
+        'C 220 d AMG Dynamic' => 'mercedes-c220d.jpg',
+        'GLC 300 e' => 'mercedes-glc.jpg',
+
+        'Ranger Wildtrak 2.0' => 'ford-ranger.jpg',
+        'Transit 2.2 Van' => 'ford-transit.jpg',
+
+        'Model 3 Long Range' => 'tesla-model3.jpg',
+        'Model Y Performance' => 'tesla-modely.jpg',
+    ];
+
+    $filename = $images[trim((string) $car->model_name)] ?? null;
+
+    if ($filename === null) {
+        return null;
+    }
+
+    $path = 'images/cars/'.$filename;
+
+    // ถ้ายังไม่ได้วางไฟล์ ให้คืน null แทนลิงก์รูปที่เปิดไม่ได้
+    if (!is_file(public_path($path))) {
+        return null;
+    }
+
+    return asset($path);
+}
 
     public static function baht(int|float|string|null $amount): string
     {

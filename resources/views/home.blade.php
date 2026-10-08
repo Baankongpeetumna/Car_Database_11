@@ -35,11 +35,12 @@
                 <div class="relative">
                     <div class="absolute bottom-6 left-0 right-0 h-3 -skew-x-12 bg-race/90"></div>
                     <div class="absolute bottom-0 left-10 right-16 h-2 -skew-x-12 bg-ink"></div>
-                    <x-store.car-art
-                        :color="$heroCar ? CarVisual::colorHex($heroCar->color) : '#D7322E'"
-                        :type="$heroCar ? CarVisual::bodyType($heroCar->category?->category_name) : 'coupe'"
-                        class="relative -rotate-2 drop-shadow-xl"
-                    />
+                    <img
+                    src="{{ asset('images/cars/rmbg-tesla.png') }}"
+                    alt="Tesla"
+                    class="relative h-auto w-full object-contain drop-shadow-xl"
+                    fetchpriority="high"
+                    >
                 </div>
                 @if ($heroCar)
                     <a href="{{ Route::has('products.show') ? route('products.show', $heroCar) : route('products.index') }}" class="relative mt-4 block w-fit rounded-2xl border border-line bg-white/95 px-4 py-3 shadow-lg transition hover:border-race sm:absolute sm:right-6 sm:top-0 sm:mt-0">
