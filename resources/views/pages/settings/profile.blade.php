@@ -4,10 +4,11 @@ use App\Models\User;
 use Flux\Flux;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-new #[Title('Profile settings')] class extends Component {
+new #[Layout('layouts::store'), Title('Profile')] class extends Component {
     public string $first_name = '';
     public string $last_name = '';
     public string $email = '';
@@ -65,114 +66,32 @@ new #[Title('Profile settings')] class extends Component {
     }
 }; ?>
 
-<section class="w-full">
-    @include('partials.settings-heading')
+<div>
+    <x-store.account-shell active="profile" heading="Profile" subheading="Update your personal information. Your address is used as the default shipping address.">
+        <form wire:submit="updateProfileInformation" class="rounded-3xl border border-line bg-white p-6">
+            <div class="grid gap-5 sm:grid-cols-2">
+                @foreach ([['first_name', 'First name', 'text', 'given-name'], ['last_name', 'Last name', 'text', 'family-name'], ['email', 'Email address', 'email', 'email'], ['phone', 'Phone number', 'tel', 'tel']] as [$name, $label, $type, $auto])
+                    <div>
+                        <label for="{{ $name }}" class="field-label">{{ $label }}</label>
+                        <input id="{{ $name }}" type="{{ $type }}" wire:model="{{ $name }}" autocomplete="{{ $auto }}" @if ($name !== 'phone') required @endif @class(['field', '!border-race' => $errors->has($name)])>
+                        @error($name) <p class="mt-1.5 text-xs text-race">{{ $message }}</p> @enderror
+                    </div>
+                @endforeach
 
-    <flux:heading level="2" class="sr-only">
-        Profile
-    </flux:heading>
-
-    <x-pages::settings.layout
-        heading="Profile"
-        subheading="Update your personal information"
-    >         @php
-            $member = auth()->user();
-            $membershipTier = $member->tier;
-        @endphp
-
-        <div class="my-6 rounded-xl border border-zinc-200 p-5 dark:border-zinc-700">
-            <h3 class="text-lg font-semibold text-zinc-900 dark:text-white">
-                Membership
-            </h3>
-
-            <dl class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
-                <div>
-                    <dt class="text-sm text-zinc-500 dark:text-zinc-400">
-                        Role
-                    </dt>
-                    <dd class="mt-1 font-semibold text-zinc-900 dark:text-white">
-                        {{ $member->isAdmin() ? 'Administrator' : 'Member' }}
-                    </dd>
+                <div class="sm:col-span-2">
+                    <label for="address" class="field-label">Address <span class="text-xs font-normal text-zinc-400">(default shipping address)</span></label>
+                    <textarea id="address" wire:model="address" rows="3" autocomplete="street-address" @class(['field', '!border-race' => $errors->has('address')])></textarea>
+                    @error('address') <p class="mt-1.5 text-xs text-race">{{ $message }}</p> @enderror
                 </div>
+            </div>
 
-                <div>
-                    <dt class="text-sm text-zinc-500 dark:text-zinc-400">
-                        Membership tier
-                    </dt>
-                    <dd class="mt-1 font-semibold text-zinc-900 dark:text-white">
-                        {{ $membershipTier?->tier_name ?? 'No tier yet' }}
-                    </dd>
-                </div>
-
-                <div>
-                    <dt class="text-sm text-zinc-500 dark:text-zinc-400">
-                        Points
-                    </dt>
-                    <dd class="mt-1 font-semibold text-zinc-900 dark:text-white">
-                        {{ number_format($member->points) }} points
-                    </dd>
-                </div>
-            </dl>
-
-            @if ($membershipTier)
-                <p class="mt-4 text-sm text-zinc-600 dark:text-zinc-300">
-                    Tier discount:
-                    {{ number_format((float) $membershipTier->discount_percent, 2) }}%
-                </p>
-            @endif
-
-            <a href="{{ route('membership.index') }}" class="mt-3 inline-block text-sm text-blue-600">
-                See all tiers and your progress →
-            </a>
-        </div>
-        <form
-            wire:submit="updateProfileInformation"
-            class="my-6 w-full space-y-6"
-        >
-            <flux:input
-                wire:model="first_name"
-                label="First name"
-                type="text"
-                required
-                autocomplete="given-name"
-            />
-
-            <flux:input
-                wire:model="last_name"
-                label="Last name"
-                type="text"
-                required
-                autocomplete="family-name"
-            />
-
-            <flux:input
-                wire:model="email"
-                label="Email"
-                type="email"
-                required
-                autocomplete="email"
-            />
-
-            <flux:input
-                wire:model="phone"
-                label="Phone number"
-                type="tel"
-                autocomplete="tel"
-            />
-
-            <flux:textarea
-                wire:model="address"
-                label="Address"
-                rows="3"
-            />
-
-            <flux:button
-                variant="primary"
-                type="submit"
-                data-test="update-profile-button"
-            >
-                Save
-            </flux:button>
+            <div class="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-5">
+                <p class="text-xs text-zinc-500">Member since {{ auth()->user()->created_at?->format('d/m/Y') ?? '-' }}</p>
+                <button type="submit" class="inline-flex items-center gap-2 rounded-xl bg-race px-5 py-2.5 text-sm font-semibold text-white hover:bg-race-dark disabled:opacity-60" wire:loading.attr="disabled" data-test="update-profile-button">
+                    <span wire:loading.remove wire:target="updateProfileInformation">Save</span>
+                    <span wire:loading wire:target="updateProfileInformation">Saving...</span>
+                </button>
+            </div>
         </form>
-    </x-pages::settings.layout>
-</section>
+    </x-store.account-shell>
+</div>
