@@ -9,11 +9,12 @@ class ExampleTest extends TestCase
 {
     use RefreshDatabase;
 
-    // หน้าแรกพาไปหน้ารายการรถ
-    public function test_home_redirects_to_car_list(): void
+    // หน้าแรกของร้านเปิดได้ และหน้ารายการรถยังเปิดได้ตามเดิม
+    public function test_home_page_and_car_list_are_reachable(): void
     {
         $this->get(route('home'))
-            ->assertRedirect('/products');
+            ->assertOk()
+            ->assertSee(route('products.index'), false);
 
         $this->get('/products')->assertOk();
     }

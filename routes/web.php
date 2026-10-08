@@ -1,11 +1,12 @@
 <?php
 
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductController; // เพิ่ม
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CartController;
 
-// หน้าแรกพาไปหน้ารายการรถ (ชื่อ route 'home' เดิม ลิงก์โลโก้และหลัง logout จึงใช้ได้เหมือนเดิม)
-Route::redirect('/', '/products')->name('home');
+// หน้าแรกของร้าน (ยี่ห้อ ประเภท รถมาใหม่ ระดับสมาชิก) ใช้ชื่อ route 'home' เดิม
+Route::get('/', HomeController::class)->name('home');
 
 // เปิดดูได้โดยไม่ต้อง login
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');

@@ -1,28 +1,28 @@
 @extends('layouts.public')
 
 @section('content')
-    @include('commerce.messages')
+    <div class="mx-auto max-w-2xl">
+        <a href="{{ route('products.show', $review->car_id) }}#reviews" class="inline-flex items-center gap-1 text-sm font-semibold text-zinc-500 hover:text-ink">
+            <x-store.icon name="arrow-left" class="size-4" /> Back to {{ $review->car?->model_name }}
+        </a>
 
-    <a href="{{ route('products.show', $review->car_id) }}#reviews"
-       class="mb-4 inline-block text-blue-600">
-        ← Back to {{ $review->car?->model_name }}
-    </a>
+        <h1 class="mt-2 font-display text-4xl font-extrabold uppercase italic leading-none text-ink">Edit Your Review</h1>
+        <p class="mt-2 text-sm text-zinc-500">{{ $review->car?->model_name }} · {{ $review->car?->model_year }}</p>
 
-    <h1 class="mb-4 text-2xl font-semibold">
-        Edit Your Review
-    </h1>
+        <div class="mt-6">
+            <x-store.flash />
+        </div>
 
-    <form method="POST"
-          action="{{ route('reviews.update', $review) }}"
-          class="max-w-2xl space-y-4 rounded-xl border border-zinc-200 p-5 dark:border-zinc-700">
-        @csrf
-        @method('PUT')
+        <form method="POST" action="{{ route('reviews.update', $review) }}" class="space-y-5 rounded-3xl border border-line bg-white p-6">
+            @csrf
+            @method('PUT')
 
-        @include('reviews._form-fields', ['review' => $review])
+            @include('reviews._form-fields', ['review' => $review])
 
-        <button type="submit"
-                class="rounded-lg bg-blue-600 px-5 py-2 text-white">
-            Save Changes
-        </button>
-    </form>
+            <div class="flex justify-end gap-2 border-t border-line pt-5">
+                <a href="{{ route('products.show', $review->car_id) }}#reviews" class="rounded-xl border border-line px-5 py-2.5 text-sm font-semibold text-ink hover:border-ink">Cancel</a>
+                <button type="submit" class="rounded-xl bg-race px-5 py-2.5 text-sm font-semibold text-white hover:bg-race-dark">Save Changes</button>
+            </div>
+        </form>
+    </div>
 @endsection

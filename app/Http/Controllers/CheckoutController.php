@@ -98,10 +98,12 @@ class CheckoutController extends Controller
             $token
         );
 
+        // order_placed ใช้แสดงหน้า "สั่งซื้อสำเร็จ" (ข้อความ success เดิมยังส่งเหมือนเดิม)
         return redirect()->route('orders.show', $order)
             ->with(
                 'success',
                 'Order placed. Please contact the store to complete payment.'
-            );
+            )
+            ->with('order_placed', true);
     }
 }
