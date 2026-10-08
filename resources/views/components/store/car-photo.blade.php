@@ -13,7 +13,7 @@
 <!-- class="absolute inset-0 size-full object-cover" -->
 
 <div {{ $attributes->merge([
-    'class' => 'relative overflow-hidden bg-paper',
+    'class' => 'relative overflow-hidden bg-white',
 ]) }}>
     @if ($src)
         <img
