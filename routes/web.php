@@ -12,10 +12,8 @@ Route::get('/', HomeController::class)->name('home');
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 Route::get('/products/{car}', [ProductController::class, 'show'])->name('products.show');
 
-Route::middleware('auth')->group(function () {
-    Route::view('/dashboard', 'dashboard')
-        ->name('dashboard');
-});
+// หน้า dashboard ของ starter kit ไม่ได้ใช้แล้ว: เก็บชื่อ route ไว้กันลิงก์เก่าพัง แต่ส่งกลับหน้า Home
+Route::redirect('/dashboard', '/')->name('dashboard');
 
 Route::middleware(['auth', 'role:admin'])
     ->prefix('admin')
