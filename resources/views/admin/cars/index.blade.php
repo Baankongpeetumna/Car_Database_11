@@ -34,9 +34,12 @@
                         <span class="text-zinc-600 dark:text-zinc-300">Cars</span>
                     </div>
 
-                    <flux:heading size="xl" level="1" class="font-display mt-2 font-semibold">
-                        Manage cars
-                    </flux:heading>
+                    
+                    <h1 class="font-display mt-1 text-4xl font-black uppercase italic leading-none tracking-tight
+                               text-zinc-900 sm:text-5xl dark:text-white">
+                        Manage Cars
+                    </h1>
+                    <div class="mt-2 h-1 w-14 -skew-x-12 bg-red-600"></div>
 
                     <flux:text class="mt-1 text-zinc-500">
                         Add, edit and restock the cars in your showroom
@@ -196,10 +199,8 @@
                         <tbody class="divide-y divide-zinc-200 dark:divide-zinc-700">
                             @forelse ($cars as $car)
                                 @php
-                                    $img = $car->image_url;
-                                    $imgSrc = $img
-                                        ? (\Illuminate\Support\Str::startsWith($img, ['http://', 'https://', '/']) ? $img : asset($img))
-                                        : null;
+                                    // Same image logic as the storefront product pages
+                                    $imgSrc = \App\Support\CarVisual::imageSrc($car);
                                 @endphp
 
                                 <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-700/30">
@@ -208,7 +209,7 @@
                                             <img src="{{ $imgSrc }}"
                                                  alt="{{ $car->model_name }}"
                                                  loading="lazy"
-                                                 class="h-12 w-20 rounded-md object-cover">
+                                                 class="h-12 w-20 rounded-md bg-white object-contain">
                                         @else
                                             <div class="flex h-12 w-20 items-center justify-center rounded-md
                                                         bg-zinc-100 text-xs text-zinc-400 dark:bg-zinc-800">

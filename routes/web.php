@@ -11,6 +11,7 @@ use App\Models\Order;
 use App\Models\User;
 use App\Models\Review;
 
+
 // หน้าแรกของร้าน (ยี่ห้อ ประเภท รถมาใหม่ ระดับสมาชิก) ใช้ชื่อ route 'home' เดิม
 Route::get('/', HomeController::class)->name('home');
 

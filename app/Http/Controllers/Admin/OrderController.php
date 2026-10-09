@@ -36,12 +36,34 @@ class OrderController extends Controller
 
         $orders = $query->paginate(15)->withQueryString();
 
-        return view('admin.orders.index', compact('orders'));
+        // Count ALL orders by status.
+        // This stays the same even when a status filter is selected.
+        $statusCounts = Order::select('status')
+            ->selectRaw('COUNT(*) as count')
+            ->groupBy('status')
+            ->pluck('count', 'status')
+            ->all();
+
+        // Make sure every status is present, even when its count is 0.
+        $statusCounts = array_merge([
+            'pending' => 0,
+            'processing' => 0,
+            'completed' => 0,
+            'cancelled' => 0,
+        ], $statusCounts);
+
+        return view('admin.orders.index', compact(
+            'orders',
+            'statusCounts'
+        ));
     }
 
     public function show(Order $order): View
     {
-        $order->load(['member.tier', 'cars.brand']);
+        $order->load([
+            'member.tier',
+            'cars.brand',
+        ]);
 
         return view('admin.orders.show', compact('order'));
     }
@@ -63,20 +85,37 @@ class OrderController extends Controller
         ]);
 
         $oldStatus = $order->status;
-        $updated = $service->changeStatus($order, $input['status']);
 
-        // บันทึก log (ไม่บันทึกถ้าส่งสถานะเดิมซ้ำ)
+        $updated = $service->changeStatus(
+            $order,
+            $input['status']
+        );
+
         if ($updated->status !== $oldStatus) {
-            $changes = ['status' => [$oldStatus, $updated->status]];
+            $changes = [
+                'status' => [
+                    $oldStatus,
+                    $updated->status,
+                ],
+            ];
 
             if ($updated->status === 'completed') {
-                $changes['points_earned'] = [0, (int) $updated->points_earned];
+                $changes['points_earned'] = [
+                    0,
+                    (int) $updated->points_earned,
+                ];
             }
 
-            AdminLog::record('status_changed', $updated, "Order #{$updated->order_id}", $changes);
+            AdminLog::record(
+                'status_changed',
+                $updated,
+                "Order #{$updated->order_id}",
+                $changes
+            );
         }
 
-        return redirect()->route('admin.orders.show', $order)
+        return redirect()
+            ->route('admin.orders.show', $order)
             ->with('success', 'Order status updated.');
     }
 }
