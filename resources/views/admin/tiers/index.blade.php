@@ -30,7 +30,7 @@
 
 <x-layouts::app :title="'Manage Membership Tiers'">
     <div class="min-h-full bg-zinc-50 dark:bg-zinc-950">
-        <div class="mx-auto max-w-7xl space-y-6 p-2 sm:p-4">
+        <div class="mx-auto max-w-[1600px] space-y-6 p-2 sm:p-4">
 
             @include('commerce.messages')
 
@@ -77,13 +77,17 @@
 
             {{-- The ladder: each tier steps up from the one before it --}}
             @if ($count)
-                @if ($count > 5)
+                {{-- Only hint at scrolling when the row can actually overflow:
+                     up to 7 tiers fit on a wide screen (2xl), more than 7 always scroll. --}}
+                @if ($count > 7)
                     <p class="hidden px-1 text-xs text-zinc-500 lg:block">Scroll sideways to see all {{ $count }} tiers →</p>
+                @elseif ($count > 5)
+                    <p class="hidden px-1 text-xs text-zinc-500 lg:block 2xl:hidden">Scroll sideways to see all {{ $count }} tiers →</p>
                 @endif
 
                 {{-- Large screens: one row, never wraps. Few tiers share the width; many tiers scroll sideways. --}}
                 <div class="grid gap-4 sm:grid-cols-2
-                            lg:snap-x lg:snap-proximity lg:grid-flow-col lg:grid-cols-none lg:auto-cols-[minmax(13.5rem,1fr)]
+                            lg:snap-x lg:snap-proximity lg:grid-flow-col lg:grid-cols-none lg:auto-cols-[minmax(11.5rem,1fr)]
                             lg:overflow-x-auto lg:px-1 lg:pb-5 lg:pt-2">
 
                     @foreach ($list as $tier)

@@ -6,6 +6,9 @@
     <body class="min-h-screen bg-white dark:bg-zinc-800">
 
     @php
+        // [rail] admins get the icon rail (<x-admin.rail />) on desktop instead of this sidebar
+        $isAdmin = auth()->user()->isAdmin();
+
         // Menu item size: height h-10 (40px), text 15px
         $navItem = 'h-10! lg:h-10! text-[15px]! font-medium';
 
@@ -15,7 +18,9 @@
             : '';
     @endphp
 
-    <flux:sidebar sticky collapsible="mobile" class="border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
+    {{-- [rail] for admins this sidebar is only the mobile drawer (hidden from lg up) --}}
+    <flux:sidebar sticky collapsible="mobile"
+        :class="'border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 ' . ($isAdmin ? 'lg:hidden!' : '')">
         <flux:sidebar.header>
             <x-app-logo :sidebar="true" href="{{ route('admin.dashboard') }}" wire:navigate />
 
@@ -188,6 +193,11 @@
 
         <x-desktop-user-menu class="hidden lg:block" :name="auth()->user()->name" />
     </flux:sidebar>
+
+    {{-- [rail] admin-only floating icon rail (desktop) --}}
+    @if ($isAdmin)
+        <x-admin.rail />
+    @endif
 
         <!-- Mobile User Menu -->
         <flux:header class="lg:hidden">

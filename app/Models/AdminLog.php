@@ -20,6 +20,12 @@ class AdminLog extends Model
         'description',
         'changes',
     ];
+    protected static function booted(): void
+    {
+        static::creating(function ($log) {
+            $log->created_at ??= now();
+        });
+    }
 
     protected $casts = [
         'changes' => 'array',
