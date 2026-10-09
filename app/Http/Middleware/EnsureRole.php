@@ -20,7 +20,7 @@ class EnsureRole
             $user instanceof User
                 && in_array($user->role, $roles, true),
             403,
-            'คุณไม่มีสิทธิ์เข้าถึงส่วนนี้',
+            'You do not have permission to access this page.',
         );
 
         return $next($request);

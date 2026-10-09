@@ -43,7 +43,7 @@ class CreateNewUser implements CreatesNewUsers
 
             if ($tier === null) {
                 throw ValidationException::withMessages([
-                    'email' => 'ยังไม่มีระดับสมาชิกเริ่มต้น กรุณาให้ผู้ดูแลรัน MembershipTierSeeder ก่อน',
+                    'email' => 'No default membership tier found. Please ask an admin to run MembershipTierSeeder first.',
                 ]);
             }
 
