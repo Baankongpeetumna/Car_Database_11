@@ -12,4 +12,10 @@
 @fonts
 
 @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+<script>
+    if (localStorage.getItem('flux.appearance') === null) {
+        localStorage.setItem('flux.appearance', 'light');
+    }
+</script>
 @fluxAppearance

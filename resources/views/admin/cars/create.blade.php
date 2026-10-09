@@ -1,11 +1,11 @@
 <x-layouts::app :title="'Add Car'">
     <div class="min-h-full bg-zinc-50 dark:bg-zinc-950">
-        <div class="space-y-6 p-2 sm:p-4">
+        <div class="mx-auto max-w-7xl space-y-5 p-2 sm:p-4">
 
             @include('commerce.messages')
 
-            {{-- Header --}}
-            <div>
+            {{-- Header: no card --}}
+            <div class="px-1">
                 <div class="flex items-center gap-2 text-sm text-zinc-400">
                     <a href="{{ route('admin.dashboard') }}" class="hover:text-red-600">Admin</a>
                     <span>/</span>
@@ -14,13 +14,13 @@
                     <span class="text-zinc-600 dark:text-zinc-300">Add new car</span>
                 </div>
 
-                <flux:heading size="xl" level="1" class="font-display mt-2 font-semibold">
+                <h1 class="font-display mt-1 text-4xl font-black uppercase italic leading-none tracking-tight
+                           text-zinc-900 sm:text-5xl dark:text-white">
                     Add new car
-                </flux:heading>
+                </h1>
+                <div class="mt-2 h-1 w-14 -skew-x-12 bg-red-600"></div>
 
-                <flux:text class="mt-1 text-zinc-500">
-                    Fill in the details to add a car to your showroom
-                </flux:text>
+                <p class="mt-2 text-sm text-zinc-500">Fill in the details and watch the preview build as you go</p>
             </div>
 
             <form method="POST"
