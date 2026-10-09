@@ -15,7 +15,6 @@ use Illuminate\View\View;
 
 class TierController extends Controller
 {
-    // tier ที่ min_points = 0 คือระดับเริ่มต้นของสมาชิกใหม่ (CreateNewUser ใช้) ต้องมีอยู่เสมอ
     private const BASE_POINTS = 0;
 
     public function index(): View
@@ -29,14 +28,21 @@ class TierController extends Controller
 
     public function create(): View
     {
-        return view('admin.tiers.create', ['tier' => new MembershipTier()]);
+        return view('admin.tiers.create', [
+            'tier' => new MembershipTier(),
+        ]);
     }
 
     public function store(Request $request): RedirectResponse
     {
         $tier = MembershipTier::create($this->validated($request));
 
-        AdminLog::record('created', $tier, $tier->tier_name, AdminLog::snapshot($tier));
+        AdminLog::record(
+            'created',
+            $tier,
+            $tier->tier_name,
+            AdminLog::snapshot($tier),
+        );
 
         return redirect()->route('admin.tiers.index')
             ->with('success', "Tier {$tier->tier_name} added.");
@@ -47,24 +53,36 @@ class TierController extends Controller
         return view('admin.tiers.edit', compact('tier'));
     }
 
-    public function update(Request $request, MembershipTier $tier): RedirectResponse
-    {
+    public function update(
+        Request $request,
+        MembershipTier $tier
+    ): RedirectResponse {
         $data = $this->validated($request, $tier);
 
-        // ห้ามเปลี่ยน min_points ของระดับเริ่มต้น ไม่งั้นสมัครสมาชิกใหม่ไม่ได้
-        if ($this->isBaseTier($tier) && (int) $data['min_points'] !== self::BASE_POINTS) {
+        // ระดับเริ่มต้นต้องมีคะแนนขั้นต่ำเป็น 0
+        if (
+            $this->isBaseTier($tier)
+            && (int) $data['min_points'] !== self::BASE_POINTS
+        ) {
             throw ValidationException::withMessages([
                 'min_points' => 'The default tier for new members must keep 0 minimum points.',
             ]);
         }
 
+        // รวมสีไว้ในข้อมูลที่บันทึกและตรวจการเปลี่ยนแปลง
         $tier->fill($data);
+
         $changes = AdminLog::pendingChanges($tier);
+
         $tier->save();
 
-        // บันทึก log เฉพาะเมื่อมีค่าเปลี่ยนจริง
         if ($changes !== []) {
-            AdminLog::record('updated', $tier, $tier->tier_name, $changes);
+            AdminLog::record(
+                'updated',
+                $tier,
+                $tier->tier_name,
+                $changes,
+            );
         }
 
         return redirect()->route('admin.tiers.index')
@@ -79,13 +97,14 @@ class TierController extends Controller
             ]);
         }
 
-        // FK ของ MEMBER ไม่มี onDelete จึงต้องเช็กก่อนลบ
         $memberCount = $tier->members()->count();
 
         if ($memberCount > 0) {
             return back()->withErrors([
                 'tier' => "Cannot delete tier {$tier->tier_name} "
-                    ."because {$memberCount} ".Str::plural('member', $memberCount).' still belong to it.',
+                    ."because {$memberCount} "
+                    .Str::plural('member', $memberCount)
+                    .' still belong to it.',
             ]);
         }
 
@@ -97,7 +116,12 @@ class TierController extends Controller
             ]);
         }
 
-        AdminLog::record('deleted', $tier, $tier->tier_name, AdminLog::snapshot($tier, deleted: true));
+        AdminLog::record(
+            'deleted',
+            $tier,
+            $tier->tier_name,
+            AdminLog::snapshot($tier, deleted: true),
+        );
 
         return redirect()->route('admin.tiers.index')
             ->with('success', "Tier {$tier->tier_name} deleted.");
@@ -108,9 +132,11 @@ class TierController extends Controller
         return (int) $tier->getOriginal('min_points') === self::BASE_POINTS;
     }
 
-    private function validated(Request $request, ?MembershipTier $tier = null): array
-    {
-        return $request->validate(
+    private function validated(
+        Request $request,
+        ?MembershipTier $tier = null
+    ): array {
+        $data = $request->validate(
             [
                 'tier_name' => [
                     'required',
@@ -119,7 +145,7 @@ class TierController extends Controller
                     Rule::unique('MEMBERSHIP_TIER', 'tier_name')
                         ->ignore($tier?->tier_id, 'tier_id'),
                 ],
-                // min_points ห้ามซ้ำ เพราะ CommerceService เลือก tier จาก min_points
+
                 'min_points' => [
                     'required',
                     'integer',
@@ -128,18 +154,39 @@ class TierController extends Controller
                     Rule::unique('MEMBERSHIP_TIER', 'min_points')
                         ->ignore($tier?->tier_id, 'tier_id'),
                 ],
-                // DECIMAL(5,2): 0.00 - 100.00
-                'discount_percent' => ['required', 'numeric', 'decimal:0,2', 'min:0', 'max:100'],
+
+                'discount_percent' => [
+                    'required',
+                    'numeric',
+                    'decimal:0,2',
+                    'min:0',
+                    'max:100',
+                ],
+
+                // รับสีแบบ HEX เช่น #F97316
+                'color' => [
+                    'required',
+                    'string',
+                    'regex:/^#[0-9a-fA-F]{6}$/',
+                ],
             ],
             [
                 'tier_name.unique' => 'This tier name already exists.',
                 'min_points.unique' => 'Another tier already uses this minimum points value.',
+                'color.required' => 'กรุณาเลือกสีของระดับสมาชิก',
+                'color.regex' => 'สีต้องเป็นรูปแบบ HEX เช่น #F97316',
             ],
             [
                 'tier_name' => 'tier name',
                 'min_points' => 'minimum points',
                 'discount_percent' => 'discount (%)',
+                'color' => 'tier color',
             ],
         );
+
+        // เก็บรหัสสีเป็นตัวพิมพ์ใหญ่ให้เหมือนกันทุกครั้ง
+        $data['color'] = strtoupper($data['color']);
+
+        return $data;
     }
 }
