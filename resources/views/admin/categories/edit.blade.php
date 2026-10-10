@@ -212,7 +212,7 @@
                             <p class="mt-1 text-sm text-zinc-500">No cars use this category. Deleting it can't be undone.</p>
                             <form method="POST" action="{{ route('admin.categories.destroy', $category) }}"
                                   data-confirm="Delete category {{ $category->category_name }}?"
-                                  onsubmit="return confirm(this.dataset.confirm)" class="mt-4">
+ class="mt-4">
                                 @csrf
                                 @method('DELETE')
 

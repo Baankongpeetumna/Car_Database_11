@@ -192,7 +192,7 @@ class MemberController extends Controller
 
         return redirect()
             ->route('admin.members.index')
-            ->with('success', 'บันทึกข้อมูลสมาชิกแล้ว');
+            ->with('success', 'Member saved successfully.');
     }
 
     public function destroy(Request $request, User $member): RedirectResponse

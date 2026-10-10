@@ -214,7 +214,7 @@
                             @if ($user && (int) $review->member_id === (int) $user->getKey())
                                 <div class="flex items-center gap-1">
                                     <a href="{{ route('reviews.edit', $review) }}" class="rounded-lg p-1.5 text-zinc-400 hover:bg-paper hover:text-ink" aria-label="Edit your review"><x-store.icon name="pencil" class="size-4" /></a>
-                                    <form method="POST" action="{{ route('reviews.destroy', $review) }}" data-confirm="Delete your review?" onsubmit="return confirm(this.dataset.confirm)">
+                                    <form method="POST" action="{{ route('reviews.destroy', $review) }}" data-confirm="Delete your review?">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="rounded-lg p-1.5 text-zinc-400 hover:bg-race-soft hover:text-race" aria-label="Delete your review"><x-store.icon name="trash" class="size-4" /></button>

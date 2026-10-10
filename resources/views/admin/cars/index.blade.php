@@ -325,7 +325,7 @@
 
                                             <form method="POST" action="{{ route('admin.cars.destroy', $car) }}"
                                                   data-confirm="Delete car {{ $car->model_name }}?"
-                                                  onsubmit="return confirm(this.dataset.confirm)">
+>
                                                 @csrf
                                                 @method('DELETE')
 

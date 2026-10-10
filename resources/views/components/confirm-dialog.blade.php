@@ -112,9 +112,10 @@
         }
 
         function cancel() {
-            var dlg = dialog();
+            var dlg = dialog(), job = pending;
             pending = null;
             if (dlg && dlg.open) dlg.close();
+            if (job) job.form.dispatchEvent(new CustomEvent('confirm-cancelled', { bubbles: true }));
         }
 
         // Intercept submits of any form that has data-confirm.
@@ -133,7 +134,7 @@
             // If <dialog> is unsupported we simply let the form submit.
         }, true);
 
-        // Buttons, backdrop and Esc.
+        // Buttons and backdrop.
         document.addEventListener('click', function (e) {
             var dlg = dialog();
             if (!dlg || !dlg.open) return;
@@ -143,8 +144,12 @@
             else if (e.target === dlg) cancel(); // click on the dimmed backdrop
         });
 
+        // Esc key: the browser closes the dialog by itself; tell the form it was cancelled.
         document.addEventListener('close', function (e) {
-            if (e.target && e.target.id === 'app-confirm') pending = null;
+            if (!e.target || e.target.id !== 'app-confirm' || !pending) return;
+            var job = pending;
+            pending = null;
+            job.form.dispatchEvent(new CustomEvent('confirm-cancelled', { bubbles: true }));
         }, true);
     })();
 </script>

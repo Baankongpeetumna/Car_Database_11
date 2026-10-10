@@ -324,7 +324,7 @@
                                         <form method="POST"
                                               action="{{ $deleteUrl }}"
                                               data-confirm="Delete {{ $member->name }}? This cannot be undone."
-                                              onsubmit="return confirm(this.dataset.confirm)">
+                                              data-confirm-ok="Delete">
                                             @csrf
                                             @method('DELETE')
 

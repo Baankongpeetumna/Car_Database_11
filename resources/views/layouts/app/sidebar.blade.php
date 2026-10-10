@@ -263,5 +263,6 @@
         @endpersist
 
         @fluxScripts
-    </body>
+        <x-confirm-dialog />
+</body>
 </html>

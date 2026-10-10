@@ -230,7 +230,7 @@
                                         method="POST"
                                         action="{{ route('admin.tiers.destroy', $tier) }}"
                                         data-confirm="Delete tier {{ $tier->tier_name }}?"
-                                        onsubmit="return confirm(this.dataset.confirm)"
+
                                     >
                                         @csrf
                                         @method('DELETE')

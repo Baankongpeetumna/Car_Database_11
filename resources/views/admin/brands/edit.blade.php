@@ -176,7 +176,7 @@
                             <p class="mt-1 text-sm text-zinc-500">No cars use this brand. Deleting it can't be undone.</p>
                             <form method="POST" action="{{ route('admin.brands.destroy', $brand) }}"
                                   data-confirm="Delete brand {{ $brand->brand_name }}?"
-                                  onsubmit="return confirm(this.dataset.confirm)" class="mt-4">
+ class="mt-4">
                                 @csrf
                                 @method('DELETE')
 

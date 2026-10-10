@@ -169,7 +169,7 @@
                     <form method="POST"
                           action="{{ route('admin.reviews.destroy', $review) }}"
                           data-confirm="Delete review #{{ $review->review_id }}?"
-                          onsubmit="return confirm(this.dataset.confirm)"
+
                           class="md:self-start">
                         @csrf
                         @method('DELETE')

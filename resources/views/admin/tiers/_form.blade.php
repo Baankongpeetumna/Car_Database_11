@@ -90,7 +90,29 @@
     ];
 @endphp
 
-{{-- LEFT: ข้อมูล Tier --}}
+{{-- Selected swatch ring. Driven by aria-pressed, so hover/focus/click states can't clear it. --}}
+<style>
+    [data-tier-swatch] { position: relative; --swatch-gap: #ffffff; }
+    .dark [data-tier-swatch] { --swatch-gap: #18181b; }
+    [data-tier-swatch][aria-pressed="true"] {
+        z-index: 1;
+        transform: scale(1.08);
+        box-shadow: 0 0 0 2px var(--swatch-gap), 0 0 0 4px #ef4444;
+    }
+
+    /* Selected state for the quick-pick chips (discount, points, suggested tiers) */
+    .js-dis[aria-pressed="true"],
+    .js-pts[aria-pressed="true"],
+    .js-preset[aria-pressed="true"] {
+        border-color: #ef4444 !important;
+        color: #ef4444 !important;
+        background-color: rgba(239, 68, 68, 0.10) !important;
+        box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.35);
+        font-weight: 700;
+    }
+</style>
+
+{{-- LEFT: tier details --}}
 <div class="relative overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
     <div class="pointer-events-none absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-red-600 via-red-500/50 to-transparent"></div>
 
@@ -111,12 +133,12 @@
             <div>
                 <h2 class="text-lg font-bold">Tier details</h2>
                 <p class="text-sm text-zinc-500">
-                    กำหนดชื่อ คะแนนขั้นต่ำ ส่วนลด และสีของระดับสมาชิก
+                    Set the name, minimum points, discount and color for this membership level.
                 </p>
             </div>
         </div>
 
-        {{-- ชื่อ --}}
+        {{-- Name --}}
         <div>
             <label for="tier_name" class="mb-1.5 block text-sm font-semibold">
                 Tier name
@@ -140,7 +162,7 @@
         </div>
 
         <div class="grid gap-5 sm:grid-cols-2">
-            {{-- คะแนน --}}
+            {{-- Points --}}
             <div>
                 <label for="min_points" class="mb-1.5 block text-sm font-semibold">
                     Minimum points
@@ -158,7 +180,7 @@
                     >
 
                     <p class="mt-1.5 text-xs text-zinc-500">
-                        ระดับเริ่มต้นของสมาชิกใหม่ต้องมีคะแนนขั้นต่ำเป็น 0
+                        The starting tier for new members must have 0 minimum points.
                     </p>
                 @else
                     <input
@@ -176,7 +198,7 @@
                     >
 
                     <p class="mt-1.5 text-xs text-zinc-500">
-                        ยอดซื้อสำเร็จทุก ฿1,000 ได้ 1 คะแนน
+                        Every ฿1,000 of completed purchases earns 1 point.
                     </p>
                 @endif
 
@@ -185,7 +207,7 @@
                 @enderror
             </div>
 
-            {{-- ส่วนลด --}}
+            {{-- Discount --}}
             <div>
                 <label for="discount_percent" class="mb-1.5 block text-sm font-semibold">
                     Discount (%)
@@ -204,7 +226,7 @@
                     @error('discount_percent') aria-invalid="true" @enderror
                 >
 
-                <p class="mt-1.5 text-xs text-zinc-500">ตั้งค่าได้ตั้งแต่ 0–100%</p>
+                <p class="mt-1.5 text-xs text-zinc-500">Any value from 0 to 100%.</p>
 
                 @error('discount_percent')
                     <p class="mt-1.5 text-xs text-red-600">{{ $message }}</p>
@@ -212,7 +234,7 @@
             </div>
         </div>
 
-        {{-- เลือกสี --}}
+        {{-- Color --}}
         <div class="space-y-3">
             <label for="tier_color" class="block text-sm font-semibold">
                 Tier color
@@ -235,18 +257,18 @@
             </div>
 
             <p id="tier-color-help" class="text-xs text-zinc-500">
-                กดช่องสีเพื่อเลือกสีเอง หรือกดเลือกจาก 24 สีด้านล่าง
+                Click the color box to pick your own, or choose one of the 24 colors below.
             </p>
 
-            <div class="grid grid-cols-8 gap-2 sm:grid-cols-12">
+            <div class="grid grid-cols-8 gap-2 p-1 sm:grid-cols-12">
                 @foreach ($palette as $colorName => $hex)
                     <button
                         type="button"
                         data-tier-swatch="{{ $hex }}"
                         title="{{ $colorName }} {{ $hex }}"
-                        aria-label="เลือกสี {{ $colorName }}"
+                        aria-label="Select color {{ $colorName }}"
                         aria-pressed="{{ $selectedColor === $hex ? 'true' : 'false' }}"
-                        class="h-9 w-full rounded-lg border border-zinc-300 transition hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500 dark:border-zinc-600"
+                        class="h-9 w-full rounded-lg border border-zinc-300 transition hover:scale-105 focus:outline-none dark:border-zinc-600"
                         style="background-color: {{ $hex }}"
                     ></button>
                 @endforeach
@@ -257,7 +279,7 @@
             @enderror
         </div>
 
-        {{-- แจ้งเตือนค่าซ้ำ --}}
+        {{-- Duplicate warning --}}
         <div id="tier-warning"
              class="hidden rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300"
              role="alert">
@@ -266,12 +288,12 @@
 
         @if ($isEdit)
             <div class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-900 dark:bg-amber-950/25 dark:text-amber-300">
-                การเปลี่ยนคะแนนขั้นต่ำจะไม่ย้ายระดับของสมาชิกทันที
-                ระบบจะคำนวณระดับใหม่เมื่อคำสั่งซื้อถัดไปสำเร็จ
+                Changing the minimum points will not move members to another tier right away.
+                Tiers are recalculated when a member's next order is completed.
             </div>
         @endif
 
-        {{-- Tier สำเร็จรูป --}}
+        {{-- Suggested tiers --}}
         @unless ($isBaseTier)
             <div>
                 <div class="flex items-center justify-between text-xs text-zinc-500">
@@ -314,7 +336,7 @@
             </div>
         @endunless
 
-        {{-- ปุ่มคะแนนและส่วนลด --}}
+        {{-- Quick points / discount --}}
         <div class="grid gap-5 sm:grid-cols-2">
             @unless ($isBaseTier)
                 <div>
@@ -358,7 +380,7 @@
         </div>
     </div>
 
-    {{-- ปุ่มบันทึก --}}
+    {{-- Save bar --}}
     <div class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 bg-zinc-50 px-5 py-4 dark:border-zinc-800 dark:bg-zinc-900/60 sm:px-6">
         <span id="tier-hint" class="text-sm text-zinc-500">
             Enter a tier name to continue
@@ -378,12 +400,12 @@
     </div>
 </div>
 
-{{-- RIGHT: Preview --}}
+{{-- RIGHT: preview --}}
 <aside class="space-y-5">
     <section class="rounded-2xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
         <div class="flex items-center justify-between text-xs text-zinc-500">
             <span>Live preview</span>
-            <span>เปลี่ยนตามข้อมูลที่กรอก</span>
+            <span>Updates as you type</span>
         </div>
 
         <div id="tier-live-preview"
@@ -436,9 +458,9 @@
     <section class="rounded-2xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
         <h2 class="text-sm font-bold">Current ladder</h2>
         <p class="mt-1 text-xs text-zinc-500">
-            แสดงสีของแต่ละ Tier พร้อมตำแหน่งระดับที่กำลังแก้ไข
+            Each tier's color, plus where the tier you're editing fits in.
         </p>
-        <ol id="ladder" class="mt-3 space-y-2"></ol>
+        <ol id="ladder" class="relative mt-3 max-h-80 space-y-2 overflow-y-auto pr-1"></ol>
     </section>
 
     <section class="rounded-2xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
@@ -446,10 +468,10 @@
 
         <ol class="mt-3 space-y-3 text-sm">
             @foreach ([
-                ['Points rule', 'ยอดซื้อสำเร็จทุก ฿1,000 ได้ 1 คะแนน'],
-                ['Unique minimum', 'คะแนนขั้นต่ำของแต่ละระดับต้องไม่ซ้ำกัน'],
-                ['Higher = better', 'ระดับที่สูงขึ้นควรได้รับส่วนลดมากขึ้น'],
-                ['Tier color', 'สีที่บันทึกจะใช้ในหน้าที่อ่านสีจาก Tier เดียวกัน'],
+                ['Points rule', 'Every ฿1,000 of completed purchases earns 1 point.'],
+                ['Unique minimum', 'Each tier needs a different minimum points value.'],
+                ['Higher = better', 'Higher tiers should give a bigger discount.'],
+                ['Tier color', 'The saved color is used on every page that reads it from the tier.'],
             ] as $index => [$title, $text])
                 <li class="flex gap-3">
                     <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-red-600/15 text-xs font-bold text-red-600">
@@ -465,294 +487,5 @@
     </section>
 </aside>
 
-<script>
-    (() => {
-        const nameEl = document.getElementById('tier_name');
-        const form = nameEl?.closest('form');
-
-        if (!form || form.dataset.tierFormReady === 'true') return;
-        form.dataset.tierFormReady = 'true';
-
-        const tiers = @json($ladder);
-        const isEdit = @json($isEdit);
-        const find = id => form.querySelector('#' + id);
-
-        const ptsEl = find('min_points');
-        const disEl = find('discount_percent');
-        const colorEl = find('tier_color');
-        const swatches = form.querySelectorAll('[data-tier-swatch]');
-
-        const fmt = value => Number(value).toLocaleString('en-US');
-
-        function validColor(value) {
-            return /^#[0-9a-f]{6}$/i.test(String(value))
-                ? String(value).toUpperCase()
-                : '#71717A';
-        }
-
-        function contrastColor(hex) {
-            const rgb = [1, 3, 5].map(offset =>
-                parseInt(hex.slice(offset, offset + 2), 16) / 255
-            );
-
-            const linear = rgb.map(value =>
-                value <= 0.04045
-                    ? value / 12.92
-                    : Math.pow((value + 0.055) / 1.055, 2.4)
-            );
-
-            const luminance = linear[0] * 0.2126
-                + linear[1] * 0.7152
-                + linear[2] * 0.0722;
-
-            return luminance > 0.179 ? '#18181B' : '#FFFFFF';
-        }
-
-        function read() {
-            const points = ptsEl.value === ''
-                ? null
-                : Number(ptsEl.value);
-
-            const discount = Number(disEl.value);
-
-            return {
-                name: nameEl.value.trim(),
-                points: points !== null && Number.isFinite(points)
-                    ? points
-                    : null,
-                discount: Number.isFinite(discount) ? discount : 0,
-                color: validColor(colorEl.value),
-            };
-        }
-
-        function render() {
-            const data = read();
-
-            find('pv-name').textContent = data.name || 'Tier name';
-            find('pv-discount').textContent = String(
-                Number(data.discount.toFixed(2))
-            );
-            find('pv-color').textContent = data.color;
-            find('tier-color-code').textContent = data.color;
-
-            const preview = find('tier-live-preview');
-            preview.style.setProperty('--tier-color', data.color);
-            preview.style.setProperty(
-                '--tier-ink',
-                contrastColor(data.color)
-            );
-
-            swatches.forEach(button => {
-                const selected =
-                    validColor(button.dataset.tierSwatch) === data.color;
-
-                button.setAttribute('aria-pressed', String(selected));
-                button.style.outline = selected
-                    ? '2px solid #EF4444'
-                    : '';
-                button.style.outlineOffset = selected ? '3px' : '';
-            });
-
-            const sameName = data.name && tiers.find(tier =>
-                tier.name.trim().toLowerCase() === data.name.toLowerCase()
-            );
-
-            const samePoints = data.points !== null && tiers.find(tier =>
-                tier.min === data.points
-            );
-
-            const rows = tiers.map(tier => ({
-                ...tier,
-                isMine: false,
-            }));
-
-            if (data.points !== null) {
-                rows.push({
-                    id: 'mine',
-                    name: data.name || (isEdit ? 'This tier' : 'New tier'),
-                    min: data.points,
-                    discount: data.discount,
-                    color: data.color,
-                    isMine: true,
-                });
-            }
-
-            rows.sort((a, b) =>
-                a.min - b.min || Number(a.isMine) - Number(b.isMine)
-            );
-
-            rows.forEach((row, index) => {
-                row.max = rows[index + 1]
-                    ? rows[index + 1].min - 1
-                    : null;
-            });
-
-            const rangeOf = row => row.max === null
-                ? fmt(row.min) + '+'
-                : fmt(row.min) + ' – ' + fmt(Math.max(row.max, row.min));
-
-            const mine = rows.find(row => row.isMine);
-
-            find('pv-range').textContent = mine ? rangeOf(mine) : '—';
-
-            const position = find('pv-position');
-
-            if (!mine) {
-                position.textContent = 'กรอกคะแนนขั้นต่ำเพื่อดูตำแหน่งระดับ';
-            } else {
-                const index = rows.indexOf(mine);
-                const below = rows[index - 1];
-                const above = rows[index + 1];
-
-                position.textContent = !below && !above
-                    ? 'เป็นระดับเดียวในระบบ'
-                    : !above
-                        ? 'ระดับสูงสุด — อยู่เหนือ ' + below.name
-                        : !below
-                            ? 'ระดับเริ่มต้น — อยู่ก่อน ' + above.name
-                            : 'อยู่ระหว่าง ' + below.name + ' และ ' + above.name;
-
-                if (below && data.discount < below.discount) {
-                    position.textContent +=
-                        ' · ส่วนลดต่ำกว่าระดับก่อนหน้า (' + below.discount + '%)';
-                }
-            }
-
-            // สร้าง DOM โดยใช้ textContent เพื่อแสดงชื่อ Tier อย่างปลอดภัย
-            const ladder = find('ladder');
-            ladder.replaceChildren();
-
-            rows.forEach(row => {
-                const item = document.createElement('li');
-                const color = validColor(row.color);
-
-                item.className =
-                    'flex items-center justify-between gap-3 rounded-lg border px-3 py-2 text-sm';
-
-                item.style.setProperty('--tier-color', color);
-
-                if (row.isMine) {
-                    item.style.backgroundColor = color;
-                    item.style.borderColor = color;
-                    item.style.color = contrastColor(color);
-                } else {
-                    item.classList.add(
-                        'border-zinc-200',
-                        'bg-zinc-50',
-                        'dark:border-zinc-700',
-                        'dark:bg-zinc-800/60'
-                    );
-                }
-
-                const info = document.createElement('div');
-                info.className = 'min-w-0';
-
-                const title = document.createElement('div');
-                title.className = 'flex items-center gap-2 font-semibold';
-
-                const dot = document.createElement('span');
-                dot.className = 'h-2 w-2 shrink-0 rounded-full';
-                dot.style.backgroundColor = row.isMine
-                    ? contrastColor(color)
-                    : color;
-
-                const name = document.createElement('span');
-                name.className = 'truncate';
-                name.textContent = row.name;
-
-                title.append(dot, name);
-
-                if (row.isMine) {
-                    const tag = document.createElement('span');
-                    tag.className =
-                        'shrink-0 text-[10px] font-bold uppercase opacity-80';
-                    tag.textContent = isEdit ? 'Editing' : 'New';
-                    title.append(tag);
-                }
-
-                const range = document.createElement('div');
-                range.className = row.isMine
-                    ? 'mt-1 text-xs opacity-80'
-                    : 'mt-1 text-xs text-zinc-500';
-                range.textContent = rangeOf(row) + ' pts';
-
-                const discount = document.createElement('span');
-                discount.className = 'shrink-0 font-bold';
-                discount.textContent = row.discount + '%';
-
-                info.append(title, range);
-                item.append(info, discount);
-                ladder.append(item);
-            });
-
-            if (rows.length === 0) {
-                const empty = document.createElement('li');
-                empty.className = 'text-xs text-zinc-500';
-                empty.textContent = 'No tiers yet.';
-                ladder.append(empty);
-            }
-
-            const message = sameName
-                ? 'มีระดับชื่อ "' + sameName.name + '" อยู่แล้ว'
-                : samePoints
-                    ? samePoints.name + ' ใช้คะแนนขั้นต่ำ '
-                        + fmt(data.points) + ' แล้ว กรุณาเลือกคะแนนอื่น'
-                    : '';
-
-            find('tier-warning').classList.toggle('hidden', !message);
-            find('tier-warning-text').textContent = message;
-
-            find('tier-hint').textContent = message
-                ? 'แก้ไขข้อมูลที่ซ้ำก่อนบันทึก'
-                : !data.name
-                    ? 'กรอกชื่อระดับสมาชิก'
-                    : data.points === null
-                        ? 'กรอกคะแนนขั้นต่ำ'
-                        : 'พร้อมบันทึก';
-        }
-
-        form.querySelectorAll('.js-preset').forEach(button => {
-            button.addEventListener('click', () => {
-                nameEl.value = button.dataset.name;
-
-                if (!ptsEl.disabled) {
-                    ptsEl.value = button.dataset.min;
-                }
-
-                disEl.value = button.dataset.discount;
-                colorEl.value = button.dataset.color;
-                render();
-            });
-        });
-
-        form.querySelectorAll('.js-pts').forEach(button => {
-            button.addEventListener('click', () => {
-                if (!ptsEl.disabled) {
-                    ptsEl.value = button.dataset.value;
-                    render();
-                }
-            });
-        });
-
-        form.querySelectorAll('.js-dis').forEach(button => {
-            button.addEventListener('click', () => {
-                disEl.value = button.dataset.value;
-                render();
-            });
-        });
-
-        swatches.forEach(button => {
-            button.addEventListener('click', () => {
-                colorEl.value = button.dataset.tierSwatch;
-                render();
-            });
-        });
-
-        [nameEl, ptsEl, disEl, colorEl].forEach(input => {
-            input.addEventListener('input', render);
-            input.addEventListener('change', render);
-        });
-
-        render();
-    })();
-</script>
+{{-- Behaviour (live preview, ladder, swatches, presets) lives in its own file --}}
+@include('admin.tiers._form-script')

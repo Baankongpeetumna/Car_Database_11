@@ -337,7 +337,7 @@
                                             <form method="POST"
                                                   action="{{ route('admin.categories.destroy', $category) }}"
                                                   data-confirm="Delete category {{ $category->category_name }}?"
-                                                  onsubmit="return confirm(this.dataset.confirm)">
+>
                                                 @csrf
                                                 @method('DELETE')
 

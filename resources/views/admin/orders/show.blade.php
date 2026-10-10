@@ -139,7 +139,10 @@
                         <form method="POST"
                               action="{{ route('admin.orders.update', $order) }}"
                               class="space-y-4 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
-                              onsubmit="var s = this.querySelector('input[name=status]:checked'); return !s || s.value === 'processing' || confirm('Set this order to ' + s.value + '? This is a final status and cannot be changed.');">
+                                    data-confirm="This is a final status and cannot be changed."
+                                    data-confirm-title="Confirm order status"
+                                    data-confirm-ok="Confirm"
+                                    data-confirm-if="input[name=status][value=completed]:checked, input[name=status][value=cancelled]:checked">
                             @csrf
                             @method('PATCH')
 

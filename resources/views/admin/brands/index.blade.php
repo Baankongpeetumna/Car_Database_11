@@ -433,7 +433,7 @@
                                         @else
                                             <form method="POST" action="{{ route('admin.brands.destroy', $b) }}"
                                                   data-confirm="Delete brand {{ $r['name'] }}?"
-                                                  onsubmit="return confirm(this.dataset.confirm)">
+>
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" title="Delete {{ $r['name'] }}" aria-label="Delete {{ $r['name'] }}"

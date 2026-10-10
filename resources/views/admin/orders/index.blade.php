@@ -183,41 +183,43 @@
                                     </div>
                                 @else
                                     <div x-data="{
-                                            idx: {{ $idx }},
-                                            orig: {{ $idx }},
-                                            drag: false,
-                                            editable: {{ $editable ? 'true' : 'false' }},
-                                            steps: @js($steps),
-                                            names: @js(array_values(array_map(fn ($s) => $labels[$s], $steps))),
-                                            knob: ['bg-amber-500', 'bg-sky-600', 'bg-emerald-600'],
-                                            fill: ['bg-amber-500', 'bg-sky-500', 'bg-emerald-500'],
-                                            pick(e) {
-                                                const r = $refs.track.getBoundingClientRect();
-                                                const p = (e.clientX - r.left) / r.width;
-                                                this.idx = Math.max(0, Math.min(2, Math.round(p * 2)));
-                                            },
-                                            start(e) {
-                                                if (!this.editable) return;
-                                                this.drag = true;
-                                                e.currentTarget.setPointerCapture(e.pointerId);
-                                                this.pick(e);
-                                            },
-                                            move(e) { if (this.drag) this.pick(e); },
-                                            end() {
-                                                if (!this.drag) return;
-                                                this.drag = false;
-                                                if (this.idx === this.orig) return;
-                                                if (confirm('เปลี่ยนสถานะออเดอร์ #{{ $order->order_id }} เป็น ' + this.names[this.idx] + ' ?')) {
-                                                    $refs.status.value = this.steps[this.idx];
-                                                    $refs.form.submit();
-                                                } else {
-                                                    this.idx = this.orig;
-                                                }
-                                            }
-                                        }">
+        idx: {{ $idx }},
+        orig: {{ $idx }},
+        drag: false,
+        editable: {{ $editable ? 'true' : 'false' }},
+        steps: @js($steps),
+        names: @js(array_values(array_map(fn ($s) => $labels[$s], $steps))),
+        knob: ['bg-amber-500', 'bg-sky-600', 'bg-emerald-600'],
+        fill: ['bg-amber-500', 'bg-sky-500', 'bg-emerald-500'],
+        pick(e) {
+            const r = $refs.track.getBoundingClientRect();
+            const p = (e.clientX - r.left) / r.width;
+            this.idx = Math.max(0, Math.min(2, Math.round(p * 2)));
+        },
+        start(e) {
+            if (!this.editable) return;
+            this.drag = true;
+            e.currentTarget.setPointerCapture(e.pointerId);
+            this.pick(e);
+        },
+        move(e) { if (this.drag) this.pick(e); },
+        end() {
+            if (!this.drag) return;
+            this.drag = false;
+            if (this.idx === this.orig) return;
+            $refs.status.value = this.steps[this.idx];
+            $refs.form.dataset.confirm = 'Change order #{{ $order->order_id }} status to ' + this.names[this.idx] + '?';
+            $refs.form.requestSubmit();
+        }
+    }">
 
                                         @if ($editable)
-                                            <form x-ref="form" method="POST" action="{{ route('admin.orders.status', $order) }}" class="hidden">
+                                            <form x-ref="form" method="POST" action="{{ route('admin.orders.status', $order) }}" class="hidden"
+                                                    data-confirm="Change order status?"
+                                                    data-confirm-title="Change order status"
+                                                    data-confirm-ok="Confirm"
+                                                    data-confirm-tone="default"
+                                                    @confirm-cancelled="idx = orig">
                                                 @csrf
                                                 @method('PATCH')
                                                 <input type="hidden" name="status" x-ref="status" value="{{ $order->status }}">
